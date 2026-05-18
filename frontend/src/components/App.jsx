@@ -16,7 +16,7 @@ import { analyzeCarImage } from "../services/geminiService";
 
 const CONCURRENCY = 2;
 
-/** Decorative background — Wowcar hero banner */
+/** Decorative background — WowCar hero banner */
 const BG_CAR_IMAGE = "/assets/images/wow-car-banner.jpg";
 
 function classifyError(err) {
@@ -143,13 +143,13 @@ export default function App() {
         <img
           src={BG_CAR_IMAGE}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.88]"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/55 via-black/40 to-black/65" />
-        <div className="absolute inset-0 bg-black/15" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/38 to-black/60" />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* Header — Wowcar (partner) left, product title right; inline actions */}
+      {/* Header — WowCar (partner) left, product title right; inline actions */}
       <header className="sticky top-0 z-20 border-b border-white/[0.08] bg-black/45 shadow-sm shadow-black/20 backdrop-blur-xl">
         <div className="mx-auto flex min-h-[4rem] max-w-6xl items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-3.5">
           {!isIdle && (
@@ -167,7 +167,7 @@ export default function App() {
               <BrandMark />
             </div>
             <h1 className="shrink-0 text-right text-base font-bold leading-tight tracking-tight text-white sm:text-lg md:text-xl">
-              WOWcar <span className="text-brand-orange">app</span>
+              WowCar <span className="text-brand-orange">app</span>
             </h1>
           </div>
         </div>
