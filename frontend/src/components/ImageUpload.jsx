@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { Upload, X, Plus, Sparkles } from "lucide-react";
 
 const ACCEPT = "image/jpeg,image/png,image/webp";
@@ -51,13 +51,10 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
   const itemsRef = useRef(items);
   itemsRef.current = items;
 
-  useEffect(() => {
-    return () => {
-      itemsRef.current.forEach(
-        (it) => it.previewUrl && URL.revokeObjectURL(it.previewUrl),
-      );
-    };
-  }, []);
+  // Do not revoke blob URLs on unmount: after "Analyze", this component unmounts
+  // while App.jsx still uses the same previewUrl on result cards. Revoking here
+  // would break those <img> sources. Revoke only in remove/clearAll; App
+  // revokes on "New Scan" (handleReset).
 
   const addFiles = useCallback(async (fileList) => {
     const files = Array.from(fileList || []);
