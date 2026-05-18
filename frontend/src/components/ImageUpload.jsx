@@ -210,7 +210,8 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
           </div>
 
           <p className={`text-[11px] ${hero ? "text-gray-400" : "text-gray-500"}`}>
-            All photos must be of the same car. AI fuses all angles into one combined listing.
+            All photos should be the same car from different angles (best accuracy). You always get
+            one listing — if a photo differs, we still pick one primary vehicle and merge details.
           </p>
 
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">

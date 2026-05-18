@@ -35,6 +35,8 @@ If the image is unusable or not a single car listing, use one of these error cod
 {"error":"no_match","error_message":"brief reason"}
 {"error":"unsupported_format","error_message":"brief reason"}
 
+Use multiple_cars ONLY when analyzing a SINGLE image where two or more unrelated vehicles are both clearly main subjects in the same frame. Do NOT use multiple_cars for multi-photo uploads: when several images are sent in one request, you must always return one merged vehicle JSON (see appended multi-image instructions).
+
 Use partial_car when the vehicle is heavily cropped, only half (or a small part) of the car is visible, or too little of the car is shown to identify make/model/year reliably. Prefer partial_car over guessing when the subject is not sufficiently in frame.
 
 For a successful identification, use this shape (omit unknown strings as null; numbers as numbers; confidence per field: "confirmed", "estimated", or "unknown"):
@@ -81,7 +83,16 @@ For estimated_price_thb you MUST always provide a point estimate in Thai Baht (T
 Never output Pakistani Rupee (PKR), "Rs", or any field named estimated_price_pkr / estimated_price_min_pkr / estimated_price_max_pkr. All prices must be plain numbers in THB only (typical used-car baht amounts in Thailand)."""
 
 
-MULTI_IMAGE_INSTRUCTION = """The following images are different photos (different angles, close-ups, interior, badges, plates) of the SAME single vehicle. Treat them as one car and return exactly ONE merged JSON listing for that car. Combine details across images: if make/model/trim/badge/plate or interior controls are clear in any image, raise that field's confidence to "confirmed". Only return a "multiple_cars" error if the images clearly show different vehicles."""
+MULTI_IMAGE_INSTRUCTION = """The user uploaded MULTIPLE photos in one request. They want ONE combined listing for a SINGLE vehicle, using every angle to improve accuracy.
+
+You MUST return the successful identification JSON shape (one vehicle only). NEVER return error code "multiple_cars" for this request — even if one photo shows a different car, a background vehicle, or angles that do not match.
+
+How to handle mismatch or mixed content:
+- Pick the PRIMARY vehicle: prefer the clearest image, the subject that appears across most images, or the vehicle that is centered / largest in frame.
+- Merge fields where images agree; when they conflict, choose the best-supported value and set confidence to "estimated" or "unknown" for that field.
+- Use "notes" briefly if helpful (e.g. mixed angles or one frame that may show another car).
+
+Raise field confidence toward "confirmed" when make/model/trim/badge/plate or interior details are clear in any image."""
 
 
 def _api_key() -> str:
