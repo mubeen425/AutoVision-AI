@@ -95,11 +95,32 @@ How to handle mismatch or mixed content:
 Raise field confidence toward "confirmed" when make/model/trim/badge/plate or interior details are clear in any image."""
 
 
-def _api_key() -> str:
-    return (
-        (os.environ.get("GEMINI_API_KEY") or "").strip()
-        or (os.environ.get("VITE_GEMINI_API_KEY") or "").strip()
-    )
+def _api_keys() -> list[str]:
+    """Ordered unique keys.
+
+    Order: GEMINI_API_KEYS (comma/whitespace), then GEMINI_API_KEY, then
+    VITE_GEMINI_API_KEY (same as first key — legacy / shared .env name),
+    then GEMINI_API_KEY_2 … GEMINI_API_KEY_5. On 429 / quota, the next key is tried.
+    """
+    keys: list[str] = []
+    raw = (os.environ.get("GEMINI_API_KEYS") or "").strip()
+    if raw:
+        for part in re.split(r"[\s,]+", raw):
+            k = part.strip()
+            if k and k not in keys:
+                keys.append(k)
+    for env_name in (
+        "GEMINI_API_KEY",
+        "VITE_GEMINI_API_KEY",
+        "GEMINI_API_KEY_2",
+        "GEMINI_API_KEY_3",
+        "GEMINI_API_KEY_4",
+        "GEMINI_API_KEY_5",
+    ):
+        k = (os.environ.get(env_name) or "").strip()
+        if k and k not in keys:
+            keys.append(k)
+    return keys
 
 
 def _model_ids() -> list[str]:
@@ -119,19 +140,23 @@ def _model_ids() -> list[str]:
     return out
 
 
+def _is_rate_limit(msg: str) -> bool:
+    return bool(re.search(r"\b429\b", msg) or re.search(r"Resource exhausted", msg, re.I))
+
+
 def _is_transient(msg: str) -> bool:
+    """Retry same key+model on these failures (backoff inside _generate_with_retries)."""
     return bool(
         re.search(r"\b503\b", msg)
-        or re.search(r"\b429\b", msg)
+        or _is_rate_limit(msg)
         or re.search(r"high demand", msg, re.I)
         or re.search(r"overloaded", msg, re.I)
         or re.search(r"unavailable", msg, re.I)
-        or re.search(r"Resource exhausted", msg, re.I)
     )
 
 
 def _classify(msg: str) -> str | None:
-    if re.search(r"\b429\b", msg) or re.search(r"Resource exhausted", msg, re.I):
+    if _is_rate_limit(msg):
         return "RATE_LIMIT"
     if re.search(r"\b503\b", msg) or re.search(r"high demand", msg, re.I) or re.search(r"overloaded", msg, re.I):
         return "SERVICE_UNAVAILABLE"
@@ -229,7 +254,15 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "has_key": bool(_api_key())}
+    keys = _api_keys()
+    models = _model_ids()
+    return {
+        "ok": True,
+        "has_key": bool(keys),
+        "key_count": len(keys),
+        "primary_model": models[0] if models else DEFAULT_MODEL,
+        "model_count": len(models),
+    }
 
 
 MAX_IMAGES_PER_REQUEST = 5
@@ -260,46 +293,49 @@ def _collect_image_parts(body: AnalyzeBody) -> tuple[list[dict], bool]:
 
 @app.post("/api/analyze")
 def analyze(body: AnalyzeBody):
-    key = _api_key()
-    if not key:
+    keys = _api_keys()
+    if not keys:
         return {"error": "API_KEY_MISSING", "error_message": "Set GEMINI_API_KEY (or VITE_GEMINI_API_KEY) in .env"}
 
-    genai.configure(api_key=key)
     image_parts, is_multi = _collect_image_parts(body)
 
     prompt = SYSTEM_PROMPT + ("\n\n" + MULTI_IMAGE_INSTRUCTION if is_multi else "")
     parts: list = [prompt, *image_parts]
 
     last_err: Exception | None = None
-    for model_id in _model_ids():
-        try:
-            model = genai.GenerativeModel(model_id)
-            response = _generate_with_retries(model, parts)
-            text = (response.text or "").strip()
-            if not text:
-                raise ValueError("PARSE_ERROR")
+    for api_key in keys:
+        genai.configure(api_key=api_key)
+        for model_id in _model_ids():
             try:
-                data = _extract_json(text)
-            except Exception:
-                return {"error": "PARSE_ERROR", "error_message": "Could not parse model JSON."}
+                model = genai.GenerativeModel(model_id)
+                response = _generate_with_retries(model, parts)
+                text = (response.text or "").strip()
+                if not text:
+                    raise ValueError("PARSE_ERROR")
+                try:
+                    data = _extract_json(text)
+                except Exception:
+                    return {"error": "PARSE_ERROR", "error_message": "Could not parse model JSON."}
 
-            if isinstance(data, dict) and data.get("error"):
-                return data
-            if isinstance(data, dict):
-                if not isinstance(data.get("confidence"), dict):
-                    data["confidence"] = {}
-                _strip_legacy_pkr_price_keys(data)
-                return data
-            return {"error": "PARSE_ERROR", "error_message": "Unexpected response shape."}
-        except Exception as e:
-            last_err = e
-            msg = str(e)
-            if _is_transient(msg):
-                continue
-            code = _classify(msg)
-            if code:
-                return {"error": code, "error_message": msg}
-            return {"error": "PARSE_ERROR", "error_message": msg}
+                if isinstance(data, dict) and data.get("error"):
+                    return data
+                if isinstance(data, dict):
+                    if not isinstance(data.get("confidence"), dict):
+                        data["confidence"] = {}
+                    _strip_legacy_pkr_price_keys(data)
+                    return data
+                return {"error": "PARSE_ERROR", "error_message": "Unexpected response shape."}
+            except Exception as e:
+                last_err = e
+                msg = str(e)
+                if _is_rate_limit(msg):
+                    break
+                if _is_transient(msg):
+                    continue
+                code = _classify(msg)
+                if code:
+                    return {"error": code, "error_message": msg}
+                return {"error": "PARSE_ERROR", "error_message": msg}
 
     code = _classify(str(last_err)) if last_err else None
     return {
