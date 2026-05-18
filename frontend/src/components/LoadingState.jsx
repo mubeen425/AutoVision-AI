@@ -8,7 +8,7 @@ export default function LoadingState() {
       <div className="text-center">
         <p className="font-medium text-gray-800">Analyzing your photo…</p>
         <p className="text-sm text-gray-500 mt-1">
-          Identifying make, model, and specs with Gemini
+          Identifying make, model, and specs…
         </p>
       </div>
     </div>

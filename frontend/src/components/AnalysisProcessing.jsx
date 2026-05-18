@@ -44,15 +44,15 @@ export default function AnalysisProcessing({ previewUrl, isQueued = false }) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-brand-orange/20 bg-gradient-to-br from-white via-brand-orange-light/30 to-white p-6 shadow-lg shadow-brand-orange/10">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-brand-orange/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-amber-200/40 blur-2xl" />
+    <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 via-zinc-900 to-black p-6 shadow-2xl shadow-black/85">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-brand-orange/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-amber-500/5 blur-3xl" />
 
       <div className="relative flex flex-col items-center gap-6">
         <div className="flex items-center gap-2 text-brand-orange">
           <Sparkles className="h-5 w-5 animate-pulse" />
           <span className="text-sm font-semibold tracking-wide uppercase">
-            {isQueued ? "In queue" : "AI Vision pipeline"}
+            {isQueued ? "In queue" : "PicoPost AI"}
           </span>
           <Sparkles className="h-5 w-5 animate-pulse" />
         </div>
@@ -61,10 +61,10 @@ export default function AnalysisProcessing({ previewUrl, isQueued = false }) {
         {previewUrl && (
           <div className="relative">
             <div
-              className="absolute inset-0 rounded-2xl ring-2 ring-brand-orange/40 ring-offset-2 ring-offset-white animate-pulse"
+              className="absolute inset-0 rounded-2xl ring-2 ring-brand-orange/40 ring-offset-2 ring-offset-slate-950 animate-pulse"
               style={{ animationDuration: "2s" }}
             />
-            <div className="relative h-52 w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 shadow-md sm:h-60 sm:max-w-md">
+            <div className="relative h-60 w-full max-w-md overflow-hidden rounded-2xl border border-slate-800 shadow-md sm:h-72 sm:max-w-xl">
               <img
                 src={previewUrl}
                 alt=""
@@ -83,14 +83,14 @@ export default function AnalysisProcessing({ previewUrl, isQueued = false }) {
         )}
 
         {/* Progress bar */}
-        <div className="w-full max-w-md space-y-2">
-          <div className="flex justify-between text-xs text-gray-500">
+        <div className="w-full max-w-xl space-y-2">
+          <div className="flex justify-between text-xs text-slate-400">
             <span>Processing</span>
             <span className="font-mono tabular-nums text-brand-orange">
               {Math.round(Math.min(progress, 92))}%
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-800">
             <div
               className="h-full rounded-full bg-gradient-to-r from-brand-orange via-amber-400 to-brand-orange transition-[width] duration-300 ease-out"
               style={{ width: `${Math.min(progress, 92)}%` }}
@@ -99,7 +99,7 @@ export default function AnalysisProcessing({ previewUrl, isQueued = false }) {
         </div>
 
         {/* Steps */}
-        <ul className="w-full max-w-md space-y-2.5">
+        <ul className="w-full max-w-xl space-y-2.5">
           {STEPS.map((step, i) => {
             const Icon = step.icon;
             const done = i < activeStep;
@@ -109,30 +109,30 @@ export default function AnalysisProcessing({ previewUrl, isQueued = false }) {
                 key={step.id}
                 className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-all duration-300 ${
                   current
-                    ? "border-brand-orange/50 bg-brand-orange-light/80 shadow-sm"
+                    ? "border-brand-orange/30 bg-brand-orange/10 text-white shadow-lg shadow-brand-orange/5"
                     : done
-                      ? "border-gray-100 bg-white/80 text-gray-600"
-                      : "border-transparent bg-gray-50/50 text-gray-400"
+                      ? "border-slate-800 bg-slate-900/40 text-slate-300"
+                      : "border-transparent bg-slate-950/20 text-slate-500"
                 }`}
               >
                 <span
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                     done
-                      ? "bg-green-100 text-green-600"
+                      ? "bg-emerald-950/50 text-emerald-400 border border-emerald-500/10"
                       : current
                         ? "bg-brand-orange text-white"
-                        : "bg-gray-200 text-gray-400"
+                        : "bg-slate-800 text-slate-500"
                   }`}
                 >
                   {done ? (
-                    <CheckCircle2 className="h-4 w-4" />
+                     <CheckCircle2 className="h-4 w-4" />
                   ) : (
                     <Icon className={`h-4 w-4 ${current ? "animate-pulse" : ""}`} />
                   )}
                 </span>
                 <span
                   className={
-                    current ? "font-semibold text-gray-900" : "font-medium"
+                    current ? "font-semibold text-white" : "font-medium text-inherit"
                   }
                 >
                   {step.label}
@@ -149,12 +149,14 @@ export default function AnalysisProcessing({ previewUrl, isQueued = false }) {
           })}
         </ul>
 
-        <p className="text-center text-xs text-gray-500">
-          {isQueued
-            ? "Your photo will start analyzing in a moment."
-            : "Gemini is analyzing your photo — results appear as a saved listing + JSON when ready."}
-        </p>
+        {isQueued && (
+          <p className="text-center text-xs text-slate-500 mt-2">
+            Your photo will start analyzing in a moment.
+          </p>
+        )}
       </div>
     </div>
   );
 }
+
+

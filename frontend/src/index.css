@@ -2,10 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Font Family definitions */
+  --font-primary: "Red Hat Display", sans-serif;
+
+  /* Bold Text Limits */
+  --font-weight-strong: 600;
+  --font-weight-heavy: 700;
+
+  /* Mobile sizes (Baseline) */
+  /* Heading 1 */
+  --h1-font-size: 42px;
+  --h1-font-weight: 800;
+  --h1-line-height: 42px;
+  --h1-letter-spacing: -2px;
+
+  /* Heading 2 */
+  --h2-font-size: 32px;
+  --h2-font-weight: 800;
+  --h2-line-height: 38px;
+  --h2-letter-spacing: -1px;
+
+  /* Heading 3 */
+  --h3-font-size: 22px;
+  --h3-font-weight: 800;
+  --h3-line-height: 24px;
+  --h3-letter-spacing: -1px;
+
+  /* Heading 4 */
+  --h4-font-size: 16px;
+  --h4-font-weight: 800;
+  --h4-line-height: 16px;
+
+  /* Body Text Copy (Paragraphs) */
+  --p-lead-size: 16px;
+  --p-lead-weight: 400;
+  --p-lead-line-height: 29px;
+
+  --p-small-size: 14px;
+  --p-small-weight: 400;
+  --p-small-line-height: 24px;
+}
+
+/* Widescreen Desktop overrides (lg screens, min-width: 1024px) */
+@media (min-width: 1024px) {
+  :root {
+    --h1-font-size: 68px;
+    --h1-line-height: 68px;
+
+    --h2-font-size: 36px;
+
+    --h3-font-size: 24px;
+  }
+}
+
 @layer base {
-  body {
-    @apply font-sans antialiased bg-gray-50;
-    min-height: 100vh;
+  html, body {
+    font-family: var(--font-primary);
+    @apply antialiased bg-zinc-950;
+    height: 100%;
+    overflow: hidden;
   }
 }
 
@@ -54,6 +110,45 @@
 @layer utilities {
   .animate-carousel-swap {
     animation: carousel-swap 0.35s ease-out both;
+  }
+
+  .font-h1 {
+    font-size: var(--h1-font-size);
+    font-weight: var(--h1-font-weight);
+    line-height: var(--h1-line-height);
+    letter-spacing: var(--h1-letter-spacing);
+  }
+
+  .font-h2 {
+    font-size: var(--h2-font-size);
+    font-weight: var(--h2-font-weight);
+    line-height: var(--h2-line-height);
+    letter-spacing: var(--h2-letter-spacing);
+  }
+
+  .font-h3 {
+    font-size: var(--h3-font-size);
+    font-weight: var(--h3-font-weight);
+    line-height: var(--h3-line-height);
+    letter-spacing: var(--h3-letter-spacing);
+  }
+
+  .font-h4 {
+    font-size: var(--h4-font-size);
+    font-weight: var(--h4-font-weight);
+    line-height: var(--h4-line-height);
+  }
+
+  .font-p-lead {
+    font-size: var(--p-lead-size);
+    font-weight: var(--p-lead-weight);
+    line-height: var(--p-lead-line-height);
+  }
+
+  .font-p-small {
+     font-size: var(--p-small-size);
+     font-weight: var(--p-small-weight);
+     line-height: var(--p-small-line-height);
   }
 }
 

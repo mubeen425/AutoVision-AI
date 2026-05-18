@@ -1,4 +1,4 @@
-# AutoVision AI — Car Listing from Photo
+# WowCar AI — Car Listing from Photo
 
 Upload a car photo and get an AI-generated listing with make, model, year, specs, estimated price, and per-field confidence indicators.
 

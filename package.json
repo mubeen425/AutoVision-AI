@@ -1,5 +1,5 @@
 {
-  "name": "autovision-ai",
+  "name": "wowcar-ai",
   "private": true,
   "version": "1.0.0",
   "description": "Monorepo root — run scripts from here or from frontend/ and backend/",

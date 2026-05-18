@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Tag,
-  Calendar,
+  CalendarDays,
   Palette,
   CarFront,
   Scissors,
@@ -9,7 +9,7 @@ import {
   Car,
   Settings,
   Wrench,
-  Square,
+  DoorClosed,
   Users,
   Download,
 } from "lucide-react";
@@ -144,14 +144,14 @@ export default function CarListing({ data, previewUrl, previewUrls }) {
     !Number.isNaN(Number(priceMax));
 
   const tags = [
-    { icon: Calendar, value: data.year },
+    { icon: CalendarDays, value: data.year },
     { icon: CarFront, value: data.body_style },
     { icon: Palette, value: data.exterior_color },
     { icon: Fuel, value: data.fuel_type },
     { icon: Settings, value: data.transmission },
     { icon: Car, value: data.drivetrain },
     { icon: Wrench, value: data.engine_displacement },
-    { icon: Square, value: data.door_count },
+    { icon: DoorClosed, value: data.door_count },
     { icon: Users, value: data.seat_count },
     { icon: Scissors, value: data.trim },
   ].filter((t) => t.value);
@@ -162,11 +162,11 @@ export default function CarListing({ data, previewUrl, previewUrls }) {
       <div className="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-lg shadow-black/10">
         {mainPreview && (
           <div className="border-b border-gray-100 bg-gray-50">
-            <div className="flex min-h-[11rem] max-h-72 items-center justify-center p-4 sm:max-h-80 sm:p-6">
+            <div className="flex min-h-[20rem] max-h-[30rem] items-center justify-center p-4 sm:max-h-[36rem] sm:p-6">
               <img
                 src={mainPreview}
                 alt="Your upload"
-                className="max-h-56 w-full max-w-2xl object-contain sm:max-h-64"
+                className="max-h-[26rem] w-full max-w-2xl object-contain sm:max-h-[32rem]"
               />
             </div>
             {allPreviews.length > 1 && (
@@ -202,7 +202,7 @@ export default function CarListing({ data, previewUrl, previewUrls }) {
         )}
         <div className="space-y-4 p-5 sm:p-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">{title}</h2>
+            <h2 className="font-h2 text-gray-900">{title}</h2>
             {price && (
               <p className="text-lg font-bold text-brand-orange sm:text-xl">{price}</p>
             )}
@@ -233,7 +233,7 @@ export default function CarListing({ data, previewUrl, previewUrls }) {
             </span>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2 sm:ml-auto">
-            <span className="text-xs text-gray-400">Read-only · AI-filled</span>
+            {/* Hidden for now:
             <button
               type="button"
               onClick={() => downloadListingForm(data)}
@@ -242,6 +242,7 @@ export default function CarListing({ data, previewUrl, previewUrls }) {
               <Download className="h-3.5 w-3.5 text-brand-orange" />
               Download
             </button>
+            */}
           </div>
         </div>
         <form className="space-y-4 p-5" onSubmit={(e) => e.preventDefault()}>

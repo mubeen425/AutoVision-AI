@@ -4,7 +4,7 @@
  * Production: VITE_API_BASE_URL overrides; otherwise defaults to deployed Render API.
  */
 
-const DEFAULT_PRODUCTION_API = "https://autovision-ai-axox.onrender.com";
+const DEFAULT_PRODUCTION_API = "https://autovision-ai-regg.onrender.com/";
 
 function apiBase() {
   const fromEnv = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");

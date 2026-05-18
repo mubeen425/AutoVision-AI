@@ -5,7 +5,7 @@ export default function BrandMark({ className = "" }) {
   return (
     <img
       src={LOGO_SRC}
-      alt="Wowcar — used cars near home"
+      alt="PicoPost"
       width={280}
       height={72}
       decoding="async"

@@ -171,24 +171,24 @@ export default function App() {
   const isAnalyzing = busyCount > 0;
 
   return (
-    <div className="min-h-screen relative text-gray-900">
+    <div className="h-screen w-screen flex flex-col overflow-hidden relative text-gray-900 bg-zinc-950">
       {/* Decorative background car (full-bleed, not zoomed) */}
       <div
-        className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
+        className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
         aria-hidden
       >
         <img
           src={BG_CAR_IMAGE}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.88]"
+          className="absolute inset-0 h-full w-full object-cover object-[32%_center] lg:object-center opacity-[0.85] transition-all duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/38 to-black/60" />
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
       {/* Header — WowCar (partner) left, product title right; inline actions */}
-      <header className="sticky top-0 z-20 border-b border-white/[0.08] bg-black/45 shadow-sm shadow-black/20 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-[4rem] max-w-6xl items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-3.5">
+      <header className="shrink-0 z-20 border-b border-white/[0.08] bg-black/45 shadow-sm shadow-black/20 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-[4rem] max-w-7xl items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-3.5">
           {!isIdle && (
             <button
               type="button"
@@ -200,31 +200,35 @@ export default function App() {
             </button>
           )}
           <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
-            <div className="min-w-0 shrink">
+            <button
+              onClick={handleReset}
+              className="min-w-0 shrink cursor-pointer transition hover:opacity-85 focus:outline-none"
+              title="Return to Home"
+            >
               <BrandMark />
-            </div>
+            </button>
             <h1 className="shrink-0 text-right text-base font-bold leading-tight tracking-tight text-white sm:text-lg md:text-xl">
-              WowCar
+              PicoPost
             </h1>
           </div>
         </div>
       </header>
 
-      {/* Main */}
-      <main className="relative max-w-6xl mx-auto px-4 py-10 md:py-14 space-y-8">
+      {/* Main - Scrollable content zone */}
+      <main className="flex-1 overflow-y-auto min-h-0 relative z-10 max-w-7xl w-full mx-auto px-4 py-6 md:py-8 space-y-6">
         {isIdle && (
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-12 lg:items-center min-h-[calc(100vh-12rem)]">
-            <div className="space-y-4 text-center lg:text-left">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-[1.1] tracking-tight">
+          <div className="flex flex-col items-center justify-center lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center min-h-[calc(100vh-10rem)] w-full py-4 lg:py-0 space-y-6 sm:space-y-8 lg:space-y-0 text-center lg:text-left">
+            <div className="space-y-4 max-w-xl mx-auto lg:mx-0">
+              <h2 className="font-h1 text-white leading-tight tracking-tight">
                 Identify any car{" "}
                 <span className="text-brand-orange">instantly</span>
               </h2>
-              <p className="text-base sm:text-lg text-gray-300 max-w-xl mx-auto lg:mx-0">
+              <p className="font-p-lead text-gray-300">
                 Upload up to 5 photos — our AI reads each vehicle and builds a
                 full listing with specs, fuel type, and an estimated price.
               </p>
             </div>
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-center w-full max-w-xl mx-auto lg:mx-0 lg:justify-end">
               <ImageUpload
                 variant="hero"
                 onAnalyze={handleAnalyze}
@@ -235,19 +239,21 @@ export default function App() {
         )}
 
         {!isIdle && (
-          <div className="space-y-6">
-            <SummaryBar
-              total={total}
-              successCount={successCount}
-              errorCount={errorCount}
-              busyCount={busyCount}
-              isAnalyzing={isAnalyzing}
-              combinedPhotoCount={
-                items.length === 1 && Array.isArray(items[0].previewUrls)
-                  ? items[0].previewUrls.length
-                  : 0
-              }
-            />
+          <div className="space-y-6 pb-6">
+            <div className={total > 1 ? "px-0 md:px-14" : "px-0"}>
+              <SummaryBar
+                total={total}
+                successCount={successCount}
+                errorCount={errorCount}
+                busyCount={busyCount}
+                isAnalyzing={isAnalyzing}
+                combinedPhotoCount={
+                  items.length === 1 && Array.isArray(items[0].previewUrls)
+                    ? items[0].previewUrls.length
+                    : 0
+                }
+              />
+            </div>
             <ResultsCarousel
               items={items}
               activeSlide={activeSlide}
@@ -257,6 +263,11 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="shrink-0 z-20 border-t border-white/[0.08] bg-black/45 shadow-sm shadow-black/20 backdrop-blur-xl py-3 text-center text-xs text-gray-400">
+        Powered by <span className="font-semibold text-white">PicoPost</span>
+      </footer>
     </div>
   );
 }
@@ -279,13 +290,13 @@ function ResultsCarousel({ items, activeSlide, onSlideChange, onRetry }) {
   }, [activeSlide, canNext, onSlideChange]);
 
   const navBtnClass =
-    "absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-30";
+    "absolute top-1/2 z-10 hidden md:flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-30";
 
   if (!activeItem) return null;
 
   return (
     <div className="space-y-4">
-      <div className="relative px-11 sm:px-14">
+      <div className={`relative ${total > 1 ? "px-0 md:px-14" : "px-0"}`}>
         {total > 1 && (
           <>
             <button

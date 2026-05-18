@@ -181,11 +181,10 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={onDrop}
-          className={`w-full max-w-md space-y-4 rounded-2xl p-4 sm:p-5 ${
-            hero
-              ? "border border-white/20 bg-gray-950/65 shadow-xl shadow-black/30 backdrop-blur-md"
-              : "border border-gray-200 bg-white shadow-sm"
-          }`}
+          className={`w-full max-w-xl space-y-4 rounded-2xl p-4 sm:p-5 ${hero
+            ? "border border-white/20 bg-gray-950/65 shadow-xl shadow-black/30 backdrop-blur-md"
+            : "border border-gray-200 bg-white shadow-sm"
+            }`}
         >
           <div className="flex items-center justify-between text-sm">
             <span
@@ -199,11 +198,10 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
             <button
               type="button"
               onClick={clearAll}
-              className={`text-xs underline-offset-2 hover:underline ${
-                hero
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`text-xs underline-offset-2 hover:underline ${hero
+                ? "text-gray-300 hover:text-white"
+                : "text-gray-500 hover:text-gray-700"
+                }`}
             >
               Clear all
             </button>
@@ -218,9 +216,8 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
             {items.map((it, i) => (
               <div
                 key={it.id}
-                className={`group relative aspect-square overflow-hidden rounded-lg border ${
-                  hero ? "border-white/10" : "border-gray-200"
-                }`}
+                className={`group relative aspect-square overflow-hidden rounded-lg border ${hero ? "border-white/10" : "border-gray-200"
+                  }`}
               >
                 <img
                   src={it.previewUrl}
@@ -245,11 +242,10 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className={`flex aspect-square items-center justify-center rounded-lg border-2 border-dashed text-xs transition ${
-                  hero
-                    ? "border-white/20 text-gray-300 hover:border-brand-orange/60 hover:bg-white/5 hover:text-white"
-                    : "border-gray-300 text-gray-500 hover:border-brand-orange hover:bg-brand-orange-light hover:text-gray-700"
-                }`}
+                className={`flex aspect-square items-center justify-center rounded-lg border-2 border-dashed text-xs transition ${hero
+                  ? "border-white/20 text-gray-300 hover:border-brand-orange/60 hover:bg-white/5 hover:text-white"
+                  : "border-gray-300 text-gray-500 hover:border-brand-orange hover:bg-brand-orange-light hover:text-gray-700"
+                  }`}
               >
                 <span className="flex flex-col items-center gap-1">
                   <Plus className="h-5 w-5" />
