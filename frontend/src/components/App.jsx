@@ -1,9 +1,11 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   RefreshCw,
   CheckCircle2,
   AlertTriangle,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import BrandMark from "./BrandMark";
 import ImageUpload from "./ImageUpload";
@@ -29,6 +31,7 @@ function classifyError(err) {
 
 export default function App() {
   const [items, setItems] = useState([]);
+  const [activeSlide, setActiveSlide] = useState(0);
 
   const updateItem = useCallback((id, patch) => {
     setItems((prev) =>
@@ -89,6 +92,7 @@ export default function App() {
   const handleAnalyze = useCallback(
     (selected) => {
       const seeded = selected.map((it) => ({ ...it, status: "queued" }));
+      setActiveSlide(0);
       setItems(seeded);
       void runBatch(seeded);
     },
@@ -107,11 +111,17 @@ export default function App() {
   );
 
   const handleReset = useCallback(() => {
+    setActiveSlide(0);
     setItems((cur) => {
       cur.forEach((it) => it.previewUrl && URL.revokeObjectURL(it.previewUrl));
       return [];
     });
   }, []);
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    setActiveSlide((i) => Math.min(i, Math.max(0, items.length - 1)));
+  }, [items.length]);
 
   const isIdle = items.length === 0;
   const total = items.length;
@@ -195,19 +205,123 @@ export default function App() {
               busyCount={busyCount}
               isAnalyzing={isAnalyzing}
             />
-            <div className="grid gap-6 lg:grid-cols-2">
-              {items.map((it, idx) => (
-                <ResultCard
-                  key={it.id}
-                  index={idx + 1}
-                  item={it}
-                  onRetry={() => handleRetry(it.id)}
-                />
-              ))}
-            </div>
+            <ResultsCarousel
+              items={items}
+              activeSlide={activeSlide}
+              onSlideChange={setActiveSlide}
+              onRetry={handleRetry}
+            />
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+const SWIPE_THRESHOLD_PX = 50;
+
+function ResultsCarousel({ items, activeSlide, onSlideChange, onRetry }) {
+  const total = items.length;
+  const touchStartX = useRef(null);
+  const canPrev = activeSlide > 0;
+  const canNext = activeSlide < total - 1;
+
+  const goPrev = useCallback(() => {
+    if (canPrev) onSlideChange(activeSlide - 1);
+  }, [activeSlide, canPrev, onSlideChange]);
+
+  const goNext = useCallback(() => {
+    if (canNext) onSlideChange(activeSlide + 1);
+  }, [activeSlide, canNext, onSlideChange]);
+
+  const navBtnClass =
+    "absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-30";
+
+  return (
+    <div className="space-y-4">
+      <div className="relative px-11 sm:px-14">
+        {total > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Previous photo"
+              disabled={!canPrev}
+              onClick={goPrev}
+              className={`${navBtnClass} left-0 sm:left-1`}
+            >
+              <ChevronLeft className="h-6 w-6" aria-hidden />
+            </button>
+            <button
+              type="button"
+              aria-label="Next photo"
+              disabled={!canNext}
+              onClick={goNext}
+              className={`${navBtnClass} right-0 sm:right-1`}
+            >
+              <ChevronRight className="h-6 w-6" aria-hidden />
+            </button>
+          </>
+        )}
+        <div
+          className="overflow-hidden rounded-2xl"
+          onTouchStart={(e) => {
+            touchStartX.current = e.changedTouches[0].clientX;
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartX.current == null) return;
+            const endX = e.changedTouches[0].clientX;
+            const dx = endX - touchStartX.current;
+            touchStartX.current = null;
+            if (Math.abs(dx) < SWIPE_THRESHOLD_PX) return;
+            if (dx > 0) goPrev();
+            else goNext();
+          }}
+        >
+          <div
+            className="flex transition-transform duration-300 ease-out motion-reduce:transition-none"
+            style={{ transform: `translate3d(-${activeSlide * 100}%, 0, 0)` }}
+          >
+            {items.map((it, idx) => (
+              <div key={it.id} className="w-full shrink-0">
+                <ResultCard
+                  index={idx + 1}
+                  item={it}
+                  onRetry={() => onRetry(it.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {total > 1 && (
+        <div
+          className="flex flex-wrap items-center justify-center gap-2"
+          role="tablist"
+          aria-label="Select photo"
+        >
+          {items.map((it, idx) => {
+            const selected = idx === activeSlide;
+            return (
+              <button
+                key={it.id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                aria-label={`Photo ${idx + 1} of ${total}`}
+                onClick={() => onSlideChange(idx)}
+                className={
+                  selected
+                    ? "min-h-[2.25rem] min-w-[2.25rem] rounded-xl bg-brand-orange px-3 text-sm font-bold text-white shadow shadow-brand-orange/25"
+                    : "min-h-[2.25rem] min-w-[2.25rem] rounded-xl border border-white/15 bg-black/40 px-3 text-sm font-semibold text-gray-200 backdrop-blur-sm transition hover:border-white/25 hover:bg-black/55 hover:text-white"
+                }
+              >
+                {idx + 1}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
