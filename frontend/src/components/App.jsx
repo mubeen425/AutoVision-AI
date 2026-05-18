@@ -16,7 +16,7 @@ import { analyzeCarImage } from "../services/geminiService";
 
 const CONCURRENCY = 2;
 
-/** Decorative background — Wowcar hero banner (blurred) */
+/** Decorative background — Wowcar hero banner */
 const BG_CAR_IMAGE = "/assets/images/wow-car-banner.jpg";
 
 function classifyError(err) {
@@ -143,10 +143,10 @@ export default function App() {
         <img
           src={BG_CAR_IMAGE}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center blur-[2px] brightness-[0.85] saturate-[0.55]"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-black/55 via-black/40 to-black/65" />
-        <div className="absolute inset-0 bg-black/15 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-black/15" />
       </div>
 
       {/* Header — Wowcar (partner) left, product title right; inline actions */}
@@ -167,7 +167,7 @@ export default function App() {
               <BrandMark />
             </div>
             <h1 className="shrink-0 text-right text-base font-bold leading-tight tracking-tight text-white sm:text-lg md:text-xl">
-              AutoVision <span className="text-brand-orange">AI</span>
+              WOWcar <span className="text-brand-orange">app</span>
             </h1>
           </div>
         </div>

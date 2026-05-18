@@ -51,9 +51,9 @@ For a successful identification, use this shape (omit unknown strings as null; n
   "drivetrain": "string or null (e.g. FWD, RWD, AWD, 4WD — from badges like quattro/4MATIC/xDrive when visible; else typical or unknown)",
   "door_count": "string or null (e.g. '2', '4', '5-door' from visible doors/body style)",
   "seat_count": "string or null (e.g. '2', '5', '7' — infer from body type when interior not visible)",
-  "estimated_price_pkr": number,
-  "estimated_price_min_pkr": number or null (optional low end of rough range; null if giving only a point estimate)",
-  "estimated_price_max_pkr": number or null (optional high end of rough range; null if giving only a point estimate)",
+  "estimated_price_thb": number,
+  "estimated_price_min_thb": number or null (optional low end of rough range; null if giving only a point estimate)",
+  "estimated_price_max_thb": number or null (optional high end of rough range; null if giving only a point estimate)",
   "notes": "short optional note",
   "confidence": {
     "make": "confirmed|estimated|unknown",
@@ -68,15 +68,15 @@ For a successful identification, use this shape (omit unknown strings as null; n
     "drivetrain": "confirmed|estimated|unknown",
     "door_count": "confirmed|estimated|unknown",
     "seat_count": "confirmed|estimated|unknown",
-    "estimated_price_pkr": "confirmed|estimated|unknown",
-    "estimated_price_min_pkr": "confirmed|estimated|unknown",
-    "estimated_price_max_pkr": "confirmed|estimated|unknown"
+    "estimated_price_thb": "confirmed|estimated|unknown",
+    "estimated_price_min_thb": "confirmed|estimated|unknown",
+    "estimated_price_max_thb": "confirmed|estimated|unknown"
   }
 }
 
-Infer fuel_type, transmission, drivetrain, engine_displacement, door_count, and seat_count from the photo when possible; otherwise infer from the identified make/model/year for Pakistan market and set confidence to "estimated" or "unknown". Transmission is often unknown from exterior-only photos — prefer "unknown" over wild guesses.
+Infer fuel_type, transmission, drivetrain, engine_displacement, door_count, and seat_count from the photo when possible; otherwise infer from the identified make/model/year for the Thailand used-car market and set confidence to "estimated" or "unknown". Transmission is often unknown from exterior-only photos — prefer "unknown" over wild guesses.
 
-For estimated_price_pkr you MUST always provide a point estimate in PKR (Pakistan used-car market). Optionally set estimated_price_min_pkr and estimated_price_max_pkr to a plausible range when uncertain; use null for min/max when you only give a single point estimate."""
+For estimated_price_thb you MUST always provide a point estimate in Thai Baht (THB) for the Thailand used-car market. Optionally set estimated_price_min_thb and estimated_price_max_thb to a plausible range when uncertain; use null for min/max when you only give a single point estimate."""
 
 
 def _api_key() -> str:
@@ -130,6 +130,24 @@ def _extract_json(text: str) -> dict:
     if start == -1 or end == -1 or end <= start:
         raise ValueError("PARSE_ERROR")
     return json.loads(raw[start : end + 1])
+
+
+def _normalize_thb_prices(data: dict) -> None:
+    """Ensure THB keys exist; copy from legacy PKR keys if the model returns the old schema."""
+    pairs = (
+        ("estimated_price_thb", "estimated_price_pkr"),
+        ("estimated_price_min_thb", "estimated_price_min_pkr"),
+        ("estimated_price_max_thb", "estimated_price_max_pkr"),
+    )
+    for thb_k, pkr_k in pairs:
+        if data.get(thb_k) is None and data.get(pkr_k) is not None:
+            data[thb_k] = data[pkr_k]
+    conf = data.get("confidence")
+    if not isinstance(conf, dict):
+        return
+    for thb_k, pkr_k in pairs:
+        if conf.get(thb_k) is None and conf.get(pkr_k) is not None:
+            conf[thb_k] = conf[pkr_k]
 
 
 def _generate_with_retries(model: genai.GenerativeModel, parts: list) -> object:
@@ -212,6 +230,7 @@ def analyze(body: AnalyzeBody):
             if isinstance(data, dict):
                 if not isinstance(data.get("confidence"), dict):
                     data["confidence"] = {}
+                _normalize_thb_prices(data)
                 return data
             return {"error": "PARSE_ERROR", "error_message": "Unexpected response shape."}
         except Exception as e:

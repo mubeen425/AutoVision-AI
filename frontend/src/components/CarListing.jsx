@@ -19,11 +19,26 @@ function formatPrice(n) {
   if (n == null || n === "") return null;
   const num = typeof n === "number" ? n : Number(String(n).replace(/[^0-9.-]/g, ""));
   if (Number.isNaN(num)) return String(n);
-  return new Intl.NumberFormat("en-PK", {
+  return new Intl.NumberFormat("th-TH", {
     style: "currency",
-    currency: "PKR",
+    currency: "THB",
     maximumFractionDigits: 0,
   }).format(num);
+}
+
+function listingPricePoint(data) {
+  if (data == null) return null;
+  return data.estimated_price_thb ?? data.estimated_price_pkr ?? null;
+}
+
+function listingPriceMin(data) {
+  if (data == null) return null;
+  return data.estimated_price_min_thb ?? data.estimated_price_min_pkr ?? null;
+}
+
+function listingPriceMax(data) {
+  if (data == null) return null;
+  return data.estimated_price_max_thb ?? data.estimated_price_max_pkr ?? null;
 }
 
 function sanitizeFilePart(s) {
@@ -48,9 +63,9 @@ function buildListingJsonObject(data) {
     engine_displacement: data.engine_displacement ?? null,
     door_count: data.door_count ?? null,
     seat_count: data.seat_count ?? null,
-    estimated_price_pkr: data.estimated_price_pkr ?? null,
-    estimated_price_min_pkr: data.estimated_price_min_pkr ?? null,
-    estimated_price_max_pkr: data.estimated_price_max_pkr ?? null,
+    estimated_price_thb: listingPricePoint(data),
+    estimated_price_min_thb: listingPriceMin(data),
+    estimated_price_max_thb: listingPriceMax(data),
     notes: data.notes ?? null,
     confidence: data.confidence ?? null,
   };
@@ -111,9 +126,9 @@ export default function CarListing({ data, previewUrl }) {
   const titleParts = [data.year, data.make, data.model].filter(Boolean);
   const title = titleParts.length ? titleParts.join(" ") : "Identified vehicle";
 
-  const price = formatPrice(data.estimated_price_pkr);
-  const priceMin = data.estimated_price_min_pkr;
-  const priceMax = data.estimated_price_max_pkr;
+  const price = formatPrice(listingPricePoint(data));
+  const priceMin = listingPriceMin(data);
+  const priceMax = listingPriceMax(data);
   const hasPriceRange =
     priceMin != null &&
     priceMax != null &&
@@ -240,17 +255,20 @@ export default function CarListing({ data, previewUrl }) {
             />
             <div className="sm:col-span-2">
               <FormField
-                label="Est. price (PKR)"
-                value={formatPrice(data.estimated_price_pkr)}
-                confidence={c.estimated_price_pkr}
+                label="Est. price (THB)"
+                value={price}
+                confidence={c.estimated_price_thb ?? c.estimated_price_pkr}
               />
             </div>
             {hasPriceRange && (
               <div className="sm:col-span-2">
                 <FormField
-                  label="Est. price range (PKR)"
+                  label="Est. price range (THB)"
                   value={`${formatPrice(priceMin)} – ${formatPrice(priceMax)}`}
                   confidence={
+                    c.estimated_price_min_thb ||
+                    c.estimated_price_max_thb ||
+                    c.estimated_price_thb ||
                     c.estimated_price_min_pkr ||
                     c.estimated_price_max_pkr ||
                     c.estimated_price_pkr
