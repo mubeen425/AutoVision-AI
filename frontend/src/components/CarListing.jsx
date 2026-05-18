@@ -120,8 +120,16 @@ function FormField({ label, value, confidence, placeholder = "—" }) {
   );
 }
 
-export default function CarListing({ data, previewUrl }) {
+export default function CarListing({ data, previewUrl, previewUrls }) {
   const c = data.confidence || {};
+  const allPreviews = Array.isArray(previewUrls) && previewUrls.length
+    ? previewUrls
+    : previewUrl
+      ? [previewUrl]
+      : [];
+  const [activePreview, setActivePreview] = React.useState(0);
+  const safeActive = Math.min(activePreview, Math.max(0, allPreviews.length - 1));
+  const mainPreview = allPreviews[safeActive] ?? null;
 
   const titleParts = [data.year, data.make, data.model].filter(Boolean);
   const title = titleParts.length ? titleParts.join(" ") : "Identified vehicle";
@@ -152,15 +160,44 @@ export default function CarListing({ data, previewUrl }) {
     <div className="space-y-6">
       {/* Light panel so title & tags stay readable on the dark page background */}
       <div className="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-lg shadow-black/10">
-        {previewUrl && (
+        {mainPreview && (
           <div className="border-b border-gray-100 bg-gray-50">
             <div className="flex min-h-[11rem] max-h-72 items-center justify-center p-4 sm:max-h-80 sm:p-6">
               <img
-                src={previewUrl}
+                src={mainPreview}
                 alt="Your upload"
                 className="max-h-56 w-full max-w-2xl object-contain sm:max-h-64"
               />
             </div>
+            {allPreviews.length > 1 && (
+              <div className="flex flex-wrap gap-2 border-t border-gray-100 bg-white px-4 py-3">
+                {allPreviews.map((u, i) => {
+                  const isActive = i === safeActive;
+                  return (
+                    <button
+                      key={`${u}-${i}`}
+                      type="button"
+                      onClick={() => setActivePreview(i)}
+                      aria-label={`View photo ${i + 1}`}
+                      className={`relative h-14 w-14 overflow-hidden rounded-md border transition ${
+                        isActive
+                          ? "border-brand-orange ring-2 ring-brand-orange/40"
+                          : "border-gray-200 hover:border-brand-orange/60"
+                      }`}
+                    >
+                      <img
+                        src={u}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="absolute left-0.5 top-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-black/70 px-1 text-[9px] font-semibold text-white">
+                        {i + 1}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
         <div className="space-y-4 p-5 sm:p-6">

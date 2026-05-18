@@ -12,7 +12,7 @@ import ImageUpload from "./ImageUpload";
 import CarListing from "./CarListing";
 import ErrorCard from "./ErrorCard";
 import AnalysisProcessing from "./AnalysisProcessing";
-import { analyzeCarImage } from "../services/geminiService";
+import { analyzeCarImage, analyzeCarPhotos } from "../services/geminiService";
 
 const CONCURRENCY = 2;
 
@@ -49,7 +49,15 @@ export default function App() {
         errorMessage: null,
       });
       try {
-        const data = await analyzeCarImage(item.base64, item.mimeType);
+        const data =
+          item.photos && item.photos.length > 1
+            ? await analyzeCarPhotos(
+                item.photos.map((p) => ({
+                  base64: p.base64,
+                  mimeType: p.mimeType,
+                })),
+              )
+            : await analyzeCarImage(item.base64, item.mimeType);
         if (data?.error) {
           updateItem(item.id, {
             status: "error",
@@ -92,10 +100,30 @@ export default function App() {
 
   const handleAnalyze = useCallback(
     (selected) => {
-      const seeded = selected.map((it) => ({ ...it, status: "queued" }));
+      if (!selected || !selected.length) return;
       setActiveSlide(0);
-      setItems(seeded);
-      void runBatch(seeded);
+
+      const merged = {
+        id: `combined-${Date.now()}`,
+        fileName:
+          selected.length === 1
+            ? selected[0]?.fileName || "1 photo"
+            : `${selected.length} photos`,
+        previewUrl: selected[0]?.previewUrl,
+        previewUrls: selected.map((it) => it.previewUrl).filter(Boolean),
+        base64: selected[0]?.base64,
+        mimeType: selected[0]?.mimeType,
+        photos: selected.map((it) => ({
+          id: it.id,
+          base64: it.base64,
+          mimeType: it.mimeType,
+          previewUrl: it.previewUrl,
+          fileName: it.fileName,
+        })),
+        status: "queued",
+      };
+      setItems([merged]);
+      void runBatch([merged]);
     },
     [runBatch],
   );
@@ -114,7 +142,14 @@ export default function App() {
   const handleReset = useCallback(() => {
     setActiveSlide(0);
     setItems((cur) => {
-      cur.forEach((it) => it.previewUrl && URL.revokeObjectURL(it.previewUrl));
+      cur.forEach((it) => {
+        const urls = new Set();
+        if (it.previewUrl) urls.add(it.previewUrl);
+        if (Array.isArray(it.previewUrls)) it.previewUrls.forEach((u) => u && urls.add(u));
+        if (Array.isArray(it.photos))
+          it.photos.forEach((p) => p?.previewUrl && urls.add(p.previewUrl));
+        urls.forEach((u) => URL.revokeObjectURL(u));
+      });
       return [];
     });
   }, []);
@@ -167,7 +202,7 @@ export default function App() {
               <BrandMark />
             </div>
             <h1 className="shrink-0 text-right text-base font-bold leading-tight tracking-tight text-white sm:text-lg md:text-xl">
-              WowCar <span className="text-brand-orange">app</span>
+              WowCar
             </h1>
           </div>
         </div>
@@ -205,6 +240,11 @@ export default function App() {
               errorCount={errorCount}
               busyCount={busyCount}
               isAnalyzing={isAnalyzing}
+              combinedPhotoCount={
+                items.length === 1 && Array.isArray(items[0].previewUrls)
+                  ? items[0].previewUrls.length
+                  : 0
+              }
             />
             <ResultsCarousel
               items={items}
@@ -326,15 +366,27 @@ function ResultsCarousel({ items, activeSlide, onSlideChange, onRetry }) {
   );
 }
 
-function SummaryBar({ total, successCount, errorCount, busyCount, isAnalyzing }) {
+function SummaryBar({
+  total,
+  successCount,
+  errorCount,
+  busyCount,
+  isAnalyzing,
+  combinedPhotoCount = 0,
+}) {
   const completed = total - busyCount;
+  const isCombined = combinedPhotoCount > 1 && total === 1;
   return (
     <div className="rounded-2xl border border-white/10 bg-black/45 px-4 py-3 backdrop-blur-md sm:px-5 sm:py-4">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-200">
         <span className="font-semibold text-white">
-          {isAnalyzing
-            ? `Analyzing ${completed + 1 > total ? total : completed + 1} of ${total}…`
-            : `Analyzed ${total} photo${total === 1 ? "" : "s"}`}
+          {isCombined
+            ? isAnalyzing
+              ? `Analyzing 1 car from ${combinedPhotoCount} photos…`
+              : `Analyzed 1 car from ${combinedPhotoCount} photos`
+            : isAnalyzing
+              ? `Analyzing ${completed + 1 > total ? total : completed + 1} of ${total}…`
+              : `Analyzed ${total} photo${total === 1 ? "" : "s"}`}
         </span>
         {successCount > 0 && (
           <span className="inline-flex items-center gap-1.5 text-emerald-300">
@@ -412,7 +464,11 @@ function ResultCard({ item, index, onRetry }) {
       <span className="absolute left-3 top-3 z-10 inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-brand-orange px-2 text-xs font-bold text-white shadow">
         #{index}
       </span>
-      <CarListing data={item.result} previewUrl={item.previewUrl} />
+      <CarListing
+        data={item.result}
+        previewUrl={item.previewUrl}
+        previewUrls={item.previewUrls}
+      />
     </div>
   );
 }

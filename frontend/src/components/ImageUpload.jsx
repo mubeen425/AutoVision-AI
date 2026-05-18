@@ -209,6 +209,10 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
             </button>
           </div>
 
+          <p className={`text-[11px] ${hero ? "text-gray-400" : "text-gray-500"}`}>
+            All photos must be of the same car. AI fuses all angles into one combined listing.
+          </p>
+
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {items.map((it, i) => (
               <div
@@ -269,10 +273,11 @@ export default function ImageUpload({ onAnalyze, isLoading, variant = "default" 
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-orange/20 transition hover:bg-brand-orange-hover disabled:opacity-60"
           >
             <Sparkles className="h-4 w-4" />
-            Analyze {items.length} photo{items.length === 1 ? "" : "s"}
+            Analyze 1 car ({items.length} photo{items.length === 1 ? "" : "s"})
           </button>
         </div>
       )}
     </div>
   );
 }
+

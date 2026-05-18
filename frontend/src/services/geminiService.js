@@ -18,14 +18,11 @@ function analyzeUrl() {
   return `${base}/api/analyze`;
 }
 
-export async function analyzeCarImage(base64, mimeType) {
+async function postAnalyze(body) {
   const res = await fetch(analyzeUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      base64,
-      mimeType: mimeType || "image/jpeg",
-    }),
+    body: JSON.stringify(body),
   });
 
   let payload;
@@ -60,4 +57,27 @@ export async function analyzeCarImage(base64, mimeType) {
     data.confidence = {};
   }
   return data;
+}
+
+export async function analyzeCarImage(base64, mimeType) {
+  return postAnalyze({ base64, mimeType: mimeType || "image/jpeg" });
+}
+
+/**
+ * Send multiple photos of the SAME car so the model fuses angles
+ * into a single listing JSON.
+ * @param {{base64: string, mimeType?: string}[]} images
+ */
+export async function analyzeCarPhotos(images) {
+  const clean = (images || [])
+    .filter((it) => it && typeof it.base64 === "string" && it.base64.length)
+    .map((it) => ({
+      base64: it.base64,
+      mimeType: it.mimeType || "image/jpeg",
+    }));
+  if (!clean.length) throw new Error("PARSE_ERROR");
+  if (clean.length === 1) {
+    return postAnalyze({ base64: clean[0].base64, mimeType: clean[0].mimeType });
+  }
+  return postAnalyze({ images: clean });
 }

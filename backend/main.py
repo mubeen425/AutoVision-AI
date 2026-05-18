@@ -81,6 +81,9 @@ For estimated_price_thb you MUST always provide a point estimate in Thai Baht (T
 Never output Pakistani Rupee (PKR), "Rs", or any field named estimated_price_pkr / estimated_price_min_pkr / estimated_price_max_pkr. All prices must be plain numbers in THB only (typical used-car baht amounts in Thailand)."""
 
 
+MULTI_IMAGE_INSTRUCTION = """The following images are different photos (different angles, close-ups, interior, badges, plates) of the SAME single vehicle. Treat them as one car and return exactly ONE merged JSON listing for that car. Combine details across images: if make/model/trim/badge/plate or interior controls are clear in any image, raise that field's confidence to "confirmed". Only return a "multiple_cars" error if the images clearly show different vehicles."""
+
+
 def _api_key() -> str:
     return (
         (os.environ.get("GEMINI_API_KEY") or "").strip()
@@ -168,9 +171,20 @@ def _generate_with_retries(model: genai.GenerativeModel, parts: list) -> object:
     raise last_err
 
 
-class AnalyzeBody(BaseModel):
+class AnalyzeImage(BaseModel):
     base64: str = Field(..., description="Raw base64, no data: URL prefix")
     mimeType: str = Field(default="image/jpeg")
+
+
+class AnalyzeBody(BaseModel):
+    # Legacy single-image fields (kept for back-compat with older frontends).
+    base64: str | None = Field(default=None, description="Raw base64, no data: URL prefix")
+    mimeType: str | None = Field(default=None)
+    # New multi-image field: multiple photos of the SAME car.
+    images: list[AnalyzeImage] | None = Field(
+        default=None,
+        description="Multiple photos of the same vehicle to fuse into one listing.",
+    )
 
 
 app = FastAPI(title="Car Vision API")
@@ -200,6 +214,32 @@ def health():
     return {"ok": True, "has_key": bool(_api_key())}
 
 
+MAX_IMAGES_PER_REQUEST = 5
+
+
+def _collect_image_parts(body: AnalyzeBody) -> tuple[list[dict], bool]:
+    """Return (parts, is_multi). Raises HTTPException for client errors."""
+    candidates: list[AnalyzeImage] = []
+    if body.images:
+        candidates = list(body.images)
+    elif body.base64:
+        candidates = [AnalyzeImage(base64=body.base64, mimeType=body.mimeType or "image/jpeg")]
+    if not candidates:
+        raise HTTPException(status_code=400, detail="no_image")
+    if len(candidates) > MAX_IMAGES_PER_REQUEST:
+        raise HTTPException(status_code=400, detail="too_many_images")
+
+    parts: list[dict] = []
+    for img in candidates:
+        try:
+            raw = base64.b64decode(img.base64, validate=True)
+        except Exception:
+            raise HTTPException(status_code=400, detail="invalid_base64")
+        mime = img.mimeType or "image/jpeg"
+        parts.append({"mime_type": mime, "data": raw})
+    return parts, len(parts) > 1
+
+
 @app.post("/api/analyze")
 def analyze(body: AnalyzeBody):
     key = _api_key()
@@ -207,13 +247,10 @@ def analyze(body: AnalyzeBody):
         return {"error": "API_KEY_MISSING", "error_message": "Set GEMINI_API_KEY (or VITE_GEMINI_API_KEY) in .env"}
 
     genai.configure(api_key=key)
-    try:
-        raw = base64.b64decode(body.base64, validate=True)
-    except Exception:
-        raise HTTPException(status_code=400, detail="invalid_base64")
+    image_parts, is_multi = _collect_image_parts(body)
 
-    mime = body.mimeType or "image/jpeg"
-    parts: list = [SYSTEM_PROMPT, {"mime_type": mime, "data": raw}]
+    prompt = SYSTEM_PROMPT + ("\n\n" + MULTI_IMAGE_INSTRUCTION if is_multi else "")
+    parts: list = [prompt, *image_parts]
 
     last_err: Exception | None = None
     for model_id in _model_ids():
