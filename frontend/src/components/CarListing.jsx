@@ -28,17 +28,17 @@ function formatPrice(n) {
 
 function listingPricePoint(data) {
   if (data == null) return null;
-  return data.estimated_price_thb ?? data.estimated_price_pkr ?? null;
+  return data.estimated_price_thb ?? null;
 }
 
 function listingPriceMin(data) {
   if (data == null) return null;
-  return data.estimated_price_min_thb ?? data.estimated_price_min_pkr ?? null;
+  return data.estimated_price_min_thb ?? null;
 }
 
 function listingPriceMax(data) {
   if (data == null) return null;
-  return data.estimated_price_max_thb ?? data.estimated_price_max_pkr ?? null;
+  return data.estimated_price_max_thb ?? null;
 }
 
 function sanitizeFilePart(s) {
@@ -257,7 +257,7 @@ export default function CarListing({ data, previewUrl }) {
               <FormField
                 label="Est. price (THB)"
                 value={price}
-                confidence={c.estimated_price_thb ?? c.estimated_price_pkr}
+                confidence={c.estimated_price_thb}
               />
             </div>
             {hasPriceRange && (
@@ -268,10 +268,7 @@ export default function CarListing({ data, previewUrl }) {
                   confidence={
                     c.estimated_price_min_thb ||
                     c.estimated_price_max_thb ||
-                    c.estimated_price_thb ||
-                    c.estimated_price_min_pkr ||
-                    c.estimated_price_max_pkr ||
-                    c.estimated_price_pkr
+                    c.estimated_price_thb
                   }
                 />
               </div>

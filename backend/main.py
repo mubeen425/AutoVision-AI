@@ -76,7 +76,9 @@ For a successful identification, use this shape (omit unknown strings as null; n
 
 Infer fuel_type, transmission, drivetrain, engine_displacement, door_count, and seat_count from the photo when possible; otherwise infer from the identified make/model/year for the Thailand used-car market and set confidence to "estimated" or "unknown". Transmission is often unknown from exterior-only photos — prefer "unknown" over wild guesses.
 
-For estimated_price_thb you MUST always provide a point estimate in Thai Baht (THB) for the Thailand used-car market. Optionally set estimated_price_min_thb and estimated_price_max_thb to a plausible range when uncertain; use null for min/max when you only give a single point estimate."""
+For estimated_price_thb you MUST always provide a point estimate in Thai Baht (THB) for the Thailand used-car market. Optionally set estimated_price_min_thb and estimated_price_max_thb to a plausible range when uncertain; use null for min/max when you only give a single point estimate.
+
+Never output Pakistani Rupee (PKR), "Rs", or any field named estimated_price_pkr / estimated_price_min_pkr / estimated_price_max_pkr. All prices must be plain numbers in THB only (typical used-car baht amounts in Thailand)."""
 
 
 def _api_key() -> str:
@@ -132,22 +134,23 @@ def _extract_json(text: str) -> dict:
     return json.loads(raw[start : end + 1])
 
 
-def _normalize_thb_prices(data: dict) -> None:
-    """Ensure THB keys exist; copy from legacy PKR keys if the model returns the old schema."""
-    pairs = (
-        ("estimated_price_thb", "estimated_price_pkr"),
-        ("estimated_price_min_thb", "estimated_price_min_pkr"),
-        ("estimated_price_max_thb", "estimated_price_max_pkr"),
-    )
-    for thb_k, pkr_k in pairs:
-        if data.get(thb_k) is None and data.get(pkr_k) is not None:
-            data[thb_k] = data[pkr_k]
+_LEGACY_PKR_PRICE_KEYS = frozenset(
+    {
+        "estimated_price_pkr",
+        "estimated_price_min_pkr",
+        "estimated_price_max_pkr",
+    }
+)
+
+
+def _strip_legacy_pkr_price_keys(data: dict) -> None:
+    """Drop PKR field names from successful listings; API is Thailand (THB) only."""
+    for k in _LEGACY_PKR_PRICE_KEYS:
+        data.pop(k, None)
     conf = data.get("confidence")
-    if not isinstance(conf, dict):
-        return
-    for thb_k, pkr_k in pairs:
-        if conf.get(thb_k) is None and conf.get(pkr_k) is not None:
-            conf[thb_k] = conf[pkr_k]
+    if isinstance(conf, dict):
+        for k in _LEGACY_PKR_PRICE_KEYS:
+            conf.pop(k, None)
 
 
 def _generate_with_retries(model: genai.GenerativeModel, parts: list) -> object:
@@ -230,7 +233,7 @@ def analyze(body: AnalyzeBody):
             if isinstance(data, dict):
                 if not isinstance(data.get("confidence"), dict):
                     data["confidence"] = {}
-                _normalize_thb_prices(data)
+                _strip_legacy_pkr_price_keys(data)
                 return data
             return {"error": "PARSE_ERROR", "error_message": "Unexpected response shape."}
         except Exception as e:
