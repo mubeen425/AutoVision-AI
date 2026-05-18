@@ -38,7 +38,8 @@ async function postAnalyze(body) {
       code === "API_KEY_MISSING" ||
       code === "PARSE_ERROR" ||
       code === "SERVICE_UNAVAILABLE" ||
-      code === "RATE_LIMIT"
+      code === "RATE_LIMIT" ||
+      code === "GEMINI_ACCESS_DENIED"
     ) {
       const err = new Error(code);
       if (payload.error_message) err.detail = payload.error_message;

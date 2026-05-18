@@ -124,6 +124,13 @@ def _classify(msg: str) -> str | None:
         return "RATE_LIMIT"
     if re.search(r"\b503\b", msg) or re.search(r"high demand", msg, re.I) or re.search(r"overloaded", msg, re.I):
         return "SERVICE_UNAVAILABLE"
+    if (
+        re.search(r"\b403\b", msg)
+        or re.search(r"denied access", msg, re.I)
+        or re.search(r"PERMISSION_DENIED", msg)
+        or re.search(r"has been denied", msg, re.I)
+    ):
+        return "GEMINI_ACCESS_DENIED"
     return None
 
 

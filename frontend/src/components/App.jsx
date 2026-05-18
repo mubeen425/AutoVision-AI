@@ -27,6 +27,8 @@ function classifyError(err) {
     return { code: "PARSE_ERROR", message: err?.detail };
   if (msg === "SERVICE_UNAVAILABLE" || msg === "RATE_LIMIT")
     return { code: msg, message: err?.detail };
+  if (msg === "GEMINI_ACCESS_DENIED")
+    return { code: "GEMINI_ACCESS_DENIED", message: err?.detail };
   return { code: "PARSE_ERROR", message: err?.message };
 }
 

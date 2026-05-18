@@ -44,6 +44,13 @@ const ERROR_CONFIG = {
     color: "red",
     tip: "Add your Gemini API key to the .env file as VITE_GEMINI_API_KEY.",
   },
+  GEMINI_ACCESS_DENIED: {
+    icon: AlertCircle,
+    title: "Gemini Access Blocked (403)",
+    color: "red",
+    tip:
+      "Google denied API access for this key or project. In Google AI Studio create a new API key (or open Cloud Console → APIs & Services → Credentials): remove HTTP referrer restrictions for server-side use, ensure “Generative Language API” is enabled for the project, and check billing/region. Update GEMINI_API_KEY on Render and redeploy.",
+  },
   PARSE_ERROR: {
     icon: AlertCircle,
     title: "Analysis Failed",
