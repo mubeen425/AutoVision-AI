@@ -152,22 +152,12 @@ class AnalyzeBody(BaseModel):
     mimeType: str = Field(default="image/jpeg")
 
 
-def _cors_origins() -> list[str]:
-    """Local dev + optional production origins (comma-separated ALLOW_ORIGINS env)."""
-    default = ["http://127.0.0.1:5173", "http://localhost:5173"]
-    extra = os.environ.get("ALLOW_ORIGINS", "").strip()
-    if not extra:
-        return default
-    merged = [*default, *[o.strip() for o in extra.split(",") if o.strip()]]
-    return list(dict.fromkeys(merged))
-
-
 app = FastAPI(title="Car Vision API")
+# Allow any browser origin (e.g. Vercel, Netlify, localhost, custom domains) to call
+# this API from the deployed Render URL. Do not set allow_credentials=True with "*".
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_cors_origins(),
-    # Vercel preview + production (*.vercel.app) without listing each URL in Render
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=["*"],
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
