@@ -1,0 +1,35 @@
+substitutions:
+  _REGION: us-central1
+  _REPO: autovision-backend
+  _SERVICE: autovision-api
+  _TAG: latest
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:${_TAG}'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:${_TAG}'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:${_TAG}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=1Gi'
+      - '--cpu=1'
+      - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,VERTEX_AI_LOCATION=${_REGION}'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:${_TAG}'

@@ -1,0 +1,275 @@
+{
+  "lang": {
+    "en": "EN",
+    "th": "ไทย",
+    "switchTo": "เปลี่ยนภาษา",
+    "english": "อังกฤษ",
+    "thai": "ไทย"
+  },
+  "app": {
+    "returnHome": "กลับหน้าแรก",
+    "install": "ติดตั้ง",
+    "installProduct": "ติดตั้ง {{product}}",
+    "alreadyInstalled": "ติดตั้งแล้ว",
+    "newScan": "สแกนใหม่",
+    "allRightsReserved": "สงวนลิขสิทธิ์",
+    "poweredBy": "ขับเคลื่อนโดย",
+    "version": "เวอร์ชัน",
+    "signOut": "ออกจากระบบ",
+    "signOutLabel": "ออกจากระบบปัจจุบันของคุณ"
+  },
+  "hero": {
+    "headline": "ลงประกาศรถ",
+    "headlineAccent": "ง่ายขึ้น",
+    "lead": "อัปโหลดรูปรถแล้วให้ AI ของ {{partner}} สร้างประกาศให้คุณในไม่กี่วินาที ขับเคลื่อนโดย {{product}}"
+  },
+  "summary": {
+    "analyzingCombined": "กำลังวิเคราะห์รถจาก {{count}} รูป…",
+    "analyzedCombined": "วิเคราะห์รถจาก {{count}} รูปแล้ว",
+    "analyzingProgress": "กำลังวิเคราะห์ {{current}} จาก {{total}}…",
+    "analyzedPhotos": "วิเคราะห์ {{count}} รูปแล้ว",
+    "analyzedPhotos_plural": "วิเคราะห์ {{count}} รูปแล้ว",
+    "translating": "กำลังแปลรายการ…",
+    "succeeded": "สำเร็จ {{count}} รายการ",
+    "failed": "ล้มเหลว {{count}} รายการ",
+    "inProgress": "กำลังดำเนินการ {{count}} รายการ"
+  },
+  "carousel": {
+    "previous": "รูปก่อนหน้า",
+    "next": "รูปถัดไป",
+    "selectPhoto": "เลือกรูป",
+    "photoOf": "รูป {{current}} จาก {{total}}"
+  },
+  "upload": {
+    "dropOrClick": "วางรูปที่นี่หรือคลิกเพื่ออัปโหลด",
+    "formats": "JPG, PNG หรือ WebP · สูงสุด {{max}} รูป",
+    "takePhoto": "ถ่ายรูป",
+    "photoCount": "{{count}} / {{max}} รูป",
+    "photoCount_plural": "{{count}} / {{max}} รูป",
+    "clearAll": "ล้างทั้งหมด",
+    "sameCarHint": "รูปทั้งหมดควรเป็นรถคันเดียวกันจากหลายมุม (แม่นยำที่สุด) คุณจะได้ประกาศเดียว — หากมีรูปที่ต่างกัน เราจะเลือกรถหลักและรวมรายละเอียดให้",
+    "analyze": "วิเคราะห์รถ ({{count}} รูป)",
+    "analyze_plural": "วิเคราะห์รถ ({{count}} รูป)",
+    "addMore": "เพิ่มรูป",
+    "camera": "กล้อง",
+    "maxFiles": "อนุญาตสูงสุด {{max}} รูป",
+    "unsupportedSkipped": "ข้ามไฟล์ที่ไม่รองรับ {{count}} ไฟล์",
+    "unsupportedSkipped_plural": "ข้ามไฟล์ที่ไม่รองรับ {{count}} ไฟล์",
+    "onlyAdded": "เพิ่มได้เพียง {{added}} รูป — สูงสุด {{max}} รูปต่อครั้ง",
+    "cameraDenied": "ไม่ได้รับอนุญาตใช้กล้อง กรุณาอนุญาตหรืออัปโหลดรูปแทน",
+    "cameraNotFound": "ไม่พบกล้องที่เหมาะสม กรุณาอัปโหลดรูปแทน",
+    "cameraFailed": "ไม่สามารถเปิดกล้องได้ กรุณาอัปโหลดรูปแทน",
+    "captureFailed": "ถ่ายรูปไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "closeCamera": "ปิดกล้อง",
+    "maxReached": "ครบ {{max}} รูปแล้ว",
+    "fitCar": "จัดให้เห็นรถทั้งคันในกรอบ",
+    "startingCamera": "กำลังเปิดกล้อง…",
+    "uploadInstead": "อัปโหลดแทน",
+    "lastCapture": "รูปล่าสุด",
+    "capturePhoto": "ถ่ายรูป",
+    "done": "เสร็จ",
+    "removePhoto": "ลบ {{fileName}}",
+    "singlePhotoName": "1 รูป",
+    "multiplePhotosName": "{{count}} รูป"
+  },
+  "processing": {
+    "inQueue": "อยู่ในคิว",
+    "aiLabel": "{{product}} AI",
+    "processing": "กำลังประมวลผล",
+    "translating": "กำลังแปลเป็นภาษาไทย…",
+    "image": "รูป",
+    "queuedHint": "รูปของคุณจะเริ่มวิเคราะห์ในไม่ช้า",
+    "steps": {
+      "0": { "label": "กำลังสแกนรูป", "labelPlural": "กำลังสแกนรูป" },
+      "1": { "label": "กำลังหาตำแหน่งรถในกรอบ" },
+      "2": { "label": "กำลังระบุยี่ห้อและรุ่น" },
+      "3": { "label": "กำลังดึงสเปกและสี" },
+      "4": { "label": "กำลังประเมินราคาตลาด" }
+    }
+  },
+  "listing": {
+    "identifiedVehicle": "รถที่ระบุได้",
+    "enhanced": "ปรับแต่งแล้ว",
+    "original": "ต้นฉบับ",
+    "yourUpload": "รูปที่อัปโหลด",
+    "enhancingBackground": "กำลังปรับพื้นหลัง…",
+    "interiorNotEnhanced": "รูปภายใน — ไม่ได้ปรับแต่ง",
+    "engineNotEnhanced": "รูปเครื่องยนต์ — ไม่ได้ปรับแต่ง",
+    "vertexBusy": "คำขอเกินกำหนด — รอ 1 นาทีแล้วอัปโหลดใหม่",
+    "requestsExceeded": "คำขอเกินกำหนด",
+    "enhancementFailed": "ปรับแต่งไม่สำเร็จ — แสดงรูปต้นฉบับ",
+    "notEnhanced": "ไม่ได้ปรับแต่ง ({{reason}})",
+    "downloadEnhanced": "ดาวน์โหลดรูปที่ปรับแล้ว",
+    "listingForm": "แบบฟอร์มประกาศ",
+    "notes": "หมายเหตุ",
+    "addNotes": "เพิ่มหมายเหตุ…",
+    "placeholder": "—",
+    "detectedFeatures": "อุปกรณ์ที่ตรวจพบ",
+    "featuresHint": "ยกเลิกเลือกอุปกรณ์ที่ไม่ต้องการแสดง",
+    "featuresConfirmed": "ยืนยันแล้ว {{confirmed}} จาก {{total}} รายการ",
+    "safetyFeatures": "อุปกรณ์ความปลอดภัย",
+    "comfortFeatures": "อุปกรณ์ความสะดวกสบาย",
+    "featuresUnavailable": "ไม่สามารถตรวจจับอุปกรณ์ความปลอดภัยและความสะดวกสบายสำหรับการสแกนนี้",
+    "aiConfidence": "ความมั่นใจ AI {{percent}}%",
+    "viewPhoto": "ดูรูป {{n}}",
+    "retryPhoto": "ลองรูปนี้อีกครั้ง",
+    "writeAdvert": "เขียนโฆษณา",
+    "writingAdvert": "กำลังเขียนโฆษณา...",
+    "previewAdvert": "พรีวิวโฆษณา",
+    "noAdvertYet": "ยังไม่มีโฆษณา",
+    "advertCreated": "สร้างโฆษณาสำเร็จแล้ว",
+    "publishRequiredIntro": "กรุณากรอกข้อมูลที่จำเป็นต่อไปนี้เพื่อเผยแพร่:",
+    "publishRequiredFieldMissing": "ต้องกรอกช่อง \"{{field}}\" ให้ครบถ้วน",
+    "publishYearInvalid": "ปีต้องเป็นตัวเลข 4 หลักที่ถูกต้อง เช่น 2020",
+    "connectAccount": "เชื่อมต่อบัญชี",
+    "accountConnected": "เชื่อมต่อบัญชีแล้ว ระบบจะใช้เซสชันที่บันทึกไว้ในการเผยแพร่",
+    "savedSessionReady": "พร้อมเผยแพร่ด้วยเซสชันที่บันทึกไว้",
+    "savedSessionFound": "พบ API token ที่บันทึกไว้ ระบบจะเผยแพร่อัตโนมัติจนกว่าจะหมดอายุ",
+    "enterCredentials": "กรอกข้อมูลเข้าสู่ระบบ Car Butler เพื่อเชื่อมต่อบัญชี",
+    "connectAndPublish": "เชื่อมต่อและเผยแพร่",
+    "publishNow": "เผยแพร่ทันที",
+    "publishToCarButler": "เผยแพร่ไปยัง Car Butler",
+    "publishToFacebook": "เผยแพร่ไปยัง Facebook",
+    "publishToInstagram": "เผยแพร่ไปยัง Instagram",
+    "alreadyPostedFacebook": "โฆษณานี้ได้รับการเผยแพร่ไปยัง Facebook เรียบร้อยแล้ว",
+    "alreadyPostedInstagram": "โฆษณานี้ได้รับการเผยแพร่ไปยัง Instagram เรียบร้อยแล้ว",
+    "postedToFacebook": "เผยแพร่ไปยัง Facebook แล้ว",
+    "postedToInstagram": "เผยแพร่ไปยัง Instagram แล้ว",
+    "regenerateAdvert": "สร้างใหม่",
+    "regeneratingAdvert": "กำลังสร้างใหม่...",
+    "copy": "คัดลอก",
+    "edit": "แก้ไข",
+    "update": "แก้ไข",
+    "saveChanges": "บันทึกการเปลี่ยนแปลง",
+    "cancel": "ยกเลิก",
+    "saveRequiredIntro": "กรุณาแก้ไขข้อผิดพลาดต่อไปนี้เพื่อบันทึกการเปลี่ยนแปลง:",
+    "priceInvalid": "ราคาตั้งขายต้องเป็นตัวเลขที่ถูกต้องและมากกว่าศูนย์",
+    "mileageInvalid": "เลขไมล์ต้องเป็นตัวเลขที่ถูกต้องและไม่ติดลบ",
+    "yearRangeInvalid": "ปีต้องอยู่ระหว่าง {{min}} ถึง {{max}}"
+  },
+  "fields": {
+    "make": "ยี่ห้อ",
+    "model": "รุ่น",
+    "year": "ปี",
+    "trim": "รุ่นย่อย",
+    "body_style": "ทรงตัวรถ",
+    "vehicle_type": "ประเภทรถ",
+    "exterior_color": "สีภายนอก",
+    "fuel_type": "เชื้อเพลิง",
+    "transmission": "เกียร์",
+    "drivetrain": "ระบบขับเคลื่อน",
+    "engine_displacement": "ขนาดเครื่องยนต์",
+    "door_count": "จำนวนประตู",
+    "vin": "หมายเลขตัวถัง (VIN)",
+    "seat_count": "จำนวนที่นั่ง",
+    "asking_price_thb": "ราคาตั้งขาย (บาท)",
+    "mileage_km": "เลขไมล์ (กม.)",
+    "estimated_price_thb": "ราคาประเมิน (บาท)",
+    "estimated_price_range": "ช่วงราคาประเมิน (บาท)",
+    "estimated_price_min_thb": "ราคาประเมินต่ำสุด (บาท)",
+    "estimated_price_max_thb": "ราคาประเมินสูงสุด (บาท)",
+    "title": "หัวข้อ",
+    "status": "สถานะประกาศ",
+    "dealer_price": "ราคาดีลเลอร์ (บาท)",
+    "reference_code": "รหัสอ้างอิง",
+    "reasons_to_buy": "เหตุผลที่ควรซื้อ",
+    "address": "ที่อยู่สถานที่",
+    "lat": "ละติจูด",
+    "lng": "ลองจิจูด",
+    "line_id": "Line ID",
+    "drive": "ระบบขับเคลื่อน",
+    "expire": "วันหมดอายุประกาศ",
+    "featured_expire": "วันหมดอายุโฆษณาแนะนำ",
+    "video_url": "ลิงก์วิดีโอ",
+    "image_ids": "รหัสรูปภาพ"
+  },
+  "confidence": {
+    "confirmed": "ยืนยันแล้ว",
+    "estimated": "ประมาณการ",
+    "unknown": "ไม่ทราบ"
+  },
+  "errors": {
+    "unclear_image": {
+      "title": "รูปไม่ชัดเจน",
+      "tip": "ลองถ่ายรูปที่ชัดและสว่างขึ้น จากด้านหน้า ข้าง หรือด้านหลังของรถ"
+    },
+    "partial_car": {
+      "title": "รถไม่เต็มกรอบ",
+      "tip": "ถ่ายให้เห็นรถมากขึ้น — หลีกเลี่ยงการครอปแคบหรือเห็นรถแค่บางส่วน ควรเห็นรถเต็มคันหรือมุมหน้า ข้าง หรือหลังที่ชัด"
+    },
+    "multiple_cars": {
+      "title": "พบรถหลายคัน",
+      "tip": "กรุณาอัปโหลดรูปที่มีรถคันเดียวเป็นหลักอย่างชัดเจน"
+    },
+    "unsupported_format": {
+      "title": "รูปแบบไฟล์ไม่รองรับ",
+      "tip": "กรุณาอัปโหลดไฟล์ JPG, PNG หรือ WebP"
+    },
+    "no_match": {
+      "title": "ไม่พบข้อมูลที่เชื่อถือได้",
+      "tip": "ไม่สามารถระบุรถได้ ลองใช้รูปที่มีความละเอียดสูงขึ้นหรือมุมอื่น"
+    },
+    "not_a_car": {
+      "title": "ไม่ใช่รูปรถ",
+      "tip": "กรุณาอัปโหลดรูปรถ"
+    },
+    "API_KEY_MISSING": {
+      "title": "แอปยังไม่ได้ตั้งค่า",
+      "tip": "แอปยังไม่ได้รับการตั้งค่าอย่างถูกต้อง กรุณาติดต่อฝ่ายสนับสนุน"
+    },
+    "GEMINI_ACCESS_DENIED": {
+      "title": "การเข้าถึงถูกปฏิเสธ",
+      "tip": "ไม่สามารถเชื่อมต่อกับบริการ AI ได้ กรุณาติดต่อฝ่ายสนับสนุน"
+    },
+    "PARSE_ERROR": {
+      "title": "สแกนล้มเหลว",
+      "tip": "เกิดข้อผิดพลาดระหว่างการวิเคราะห์รูป กรุณาลองอีกครั้ง"
+    },
+    "SERVICE_UNAVAILABLE": {
+      "title": "บริการไม่ว่างชั่วคราว",
+      "tip": "Gemini มีความต้องการสูง แอปจะลองใหม่อัตโนมัติ รอสักครู่แล้วลองอีกครั้ง"
+    },
+    "RATE_LIMIT": {
+      "title": "คำขอมากเกินไป",
+      "tip": "คุณส่งคำขอสแกนมากเกินไปในเวลาสั้น กรุณารอสักครู่แล้วลองอีกครั้ง"
+    },
+    "default": {
+      "title": "เกิดข้อผิดพลาด",
+      "tip": "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองอีกครั้ง"
+    }
+  },
+  "installPrompt": {
+    "title": "ติดตั้ง {{product}}",
+    "description": "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้รวดเร็วและใช้งานเหมือนแอป",
+    "install": "ติดตั้ง",
+    "notNow": "ไม่ใช่ตอนนี้",
+    "dismiss": "ปิดคำแนะนำการติดตั้ง",
+    "dialogLabel": "ติดตั้งแอป"
+  },
+  "loadingState": {
+    "analyzingPhoto": "กำลังวิเคราะห์รูปของคุณ…",
+    "identifyingSpecs": "กำลังระบุยี่ห้อ รุ่น และสเปก…"
+  },
+  "login": {
+    "welcomeBack": "ยินดีต้อนรับกลับมา",
+    "signInToAccess": "เข้าสู่ระบบเพื่อใช้งาน {{product}}",
+    "username": "ชื่อผู้ใช้",
+    "usernamePlaceholder": "ใส่ชื่อผู้ใช้",
+    "password": "รหัสผ่าน",
+    "passwordPlaceholder": "ใส่รหัสผ่าน",
+    "signIn": "เข้าสู่ระบบ",
+    "verifying": "กำลังตรวจสอบ…",
+    "invalidCredentials": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง",
+    "serverError": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง",
+    "hidePassword": "ซ่อนรหัสผ่าน",
+    "showPassword": "แสดงรหัสผ่าน",
+    "loginSuccess": "เข้าสู่ระบบสำเร็จ!"
+  },
+  "pwa": {
+    "installApp": "ติดตั้งแอป",
+    "installing": "กำลังติดตั้ง…",
+    "installCardHint": "ติดตั้งเพื่อประสบการณ์ที่รวดเร็วขึ้นเสมือนแอปจริง",
+    "alreadyInstalled": "ติดตั้งแอปแล้ว",
+    "alreadyInstalledDesc": "ติดตั้งแอปแล้ว"
+  }
+}

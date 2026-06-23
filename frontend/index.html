@@ -3,12 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/wow-icon.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F47B20" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>PicoPost</title>
+    <meta name="description" content="AI-powered car listing builder by WowCar. Upload photos, get specs and market estimates instantly." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PicoPost" />
+    <title>WowCar – The Map to Your Next Car</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.deferredPwaPrompt = e;
+      });
+    </script>
+    <!-- Facebook SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0" nonce="ABC123"></script>
   </head>
   <body>
     <div id="root"></div>

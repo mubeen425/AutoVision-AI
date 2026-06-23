@@ -1,0 +1,8 @@
+ERROR: (gcloud.config.get-value) unrecognized arguments:
+  ;
+  gcloud
+  auth
+  list
+  --filter=status:ACTIVE (did you mean '--flatten'?)
+  To search the help text of gcloud commands, run:
+  gcloud help -- SEARCH_TERMS

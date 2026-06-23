@@ -1,0 +1,275 @@
+{
+  "lang": {
+    "en": "EN",
+    "th": "ไทย",
+    "switchTo": "Switch language",
+    "english": "English",
+    "thai": "Thai"
+  },
+  "app": {
+    "returnHome": "Return to Home",
+    "install": "Install",
+    "installProduct": "Install {{product}}",
+    "alreadyInstalled": "Installed",
+    "newScan": "New Scan",
+    "allRightsReserved": "All Rights Reserved",
+    "poweredBy": "Powered by",
+    "version": "Version",
+    "signOut": "Sign Out",
+    "signOutLabel": "Sign out of your session"
+  },
+  "hero": {
+    "headline": "Car Listings",
+    "headlineAccent": "Made Easy",
+    "lead": "Upload your photos and let {{partner}}'s AI build your listing in seconds. Powered by {{product}}."
+  },
+  "summary": {
+    "analyzingCombined": "Analyzing Car From {{count}} Photos…",
+    "analyzedCombined": "Analyzed Car From {{count}} Photos",
+    "analyzingProgress": "Analyzing {{current}} of {{total}}…",
+    "analyzedPhotos": "Analyzed {{count}} Photo",
+    "analyzedPhotos_plural": "Analyzed {{count}} Photos",
+    "translating": "Translating listing…",
+    "succeeded": "{{count}} Succeeded",
+    "failed": "{{count}} Failed",
+    "inProgress": "{{count}} In Progress"
+  },
+  "carousel": {
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "selectPhoto": "Select photo",
+    "photoOf": "Photo {{current}} of {{total}}"
+  },
+  "upload": {
+    "dropOrClick": "Drop photos here or click to upload",
+    "formats": "JPG, PNG, or WebP · up to {{max}} images",
+    "takePhoto": "Take photo",
+    "photoCount": "{{count}} / {{max}} photo",
+    "photoCount_plural": "{{count}} / {{max}} photos",
+    "clearAll": "Clear all",
+    "sameCarHint": "All photos should be the same car from different angles (best accuracy). You always get one listing — if a photo differs, we still pick one primary vehicle and merge details.",
+    "analyze": "Analyze Car ({{count}} Photo)",
+    "analyze_plural": "Analyze Car ({{count}} Photos)",
+    "addMore": "Add more",
+    "camera": "Camera",
+    "maxFiles": "Up to {{max}} images allowed.",
+    "unsupportedSkipped": "{{count}} unsupported file skipped",
+    "unsupportedSkipped_plural": "{{count}} unsupported files skipped",
+    "onlyAdded": "Only {{added}} added — max {{max}} per scan",
+    "cameraDenied": "Camera permission denied. Allow camera access or upload a photo instead.",
+    "cameraNotFound": "No suitable camera found. Please upload a photo instead.",
+    "cameraFailed": "Could not start the camera. Upload a photo instead.",
+    "captureFailed": "Capture failed. Please try again.",
+    "closeCamera": "Close camera",
+    "maxReached": "Max {{max}} photos reached",
+    "fitCar": "Fit the whole car in the frame",
+    "startingCamera": "Starting camera…",
+    "uploadInstead": "Upload instead",
+    "lastCapture": "Last capture",
+    "capturePhoto": "Capture photo",
+    "done": "Done",
+    "removePhoto": "Remove {{fileName}}",
+    "singlePhotoName": "1 photo",
+    "multiplePhotosName": "{{count}} photos"
+  },
+  "processing": {
+    "inQueue": "In queue",
+    "aiLabel": "{{product}} AI",
+    "processing": "Processing",
+    "translating": "Translating to Thai…",
+    "image": "Image",
+    "queuedHint": "Your Photo Will Start Analyzing In A Moment.",
+    "steps": {
+      "0": { "label": "Scanning Image", "labelPlural": "Scanning Images" },
+      "1": { "label": "Locating Vehicle in Frame" },
+      "2": { "label": "Identifying Make & Model" },
+      "3": { "label": "Extracting Specs & Colour" },
+      "4": { "label": "Computing Market Estimate" }
+    }
+  },
+  "listing": {
+    "identifiedVehicle": "Identified vehicle",
+    "enhanced": "Enhanced",
+    "original": "Original",
+    "yourUpload": "Your upload",
+    "enhancingBackground": "Enhancing background…",
+    "interiorNotEnhanced": "Interior photo — not enhanced",
+    "engineNotEnhanced": "Engine photo — not enhanced",
+    "vertexBusy": "Requests Exceeded — wait 1 min and re-upload",
+    "requestsExceeded": "Requests Exceeded",
+    "enhancementFailed": "Enhancement failed — showing original",
+    "notEnhanced": "Not enhanced ({{reason}})",
+    "downloadEnhanced": "Download enhanced",
+    "listingForm": "Listing Form",
+    "notes": "Notes",
+    "addNotes": "Add notes…",
+    "placeholder": "—",
+    "detectedFeatures": "Detected Features",
+    "featuresHint": "Uncheck features you do not wish to display.",
+    "featuresConfirmed": "{{confirmed}} of {{total}} confirmed on car",
+    "safetyFeatures": "Safety Features",
+    "comfortFeatures": "Comfort Features",
+    "featuresUnavailable": "Safety and comfort feature detection was unavailable for this scan.",
+    "aiConfidence": "{{percent}}% AI confidence",
+    "viewPhoto": "View photo {{n}}",
+    "retryPhoto": "Retry this photo",
+    "writeAdvert": "Write Ad",
+    "writingAdvert": "Writing Ad...",
+    "previewAdvert": "Preview Ad",
+    "noAdvertYet": "No ad yet.",
+    "advertCreated": "Ad created successfully.",
+    "publishRequiredIntro": "Please complete the following required fields to publish:",
+    "publishRequiredFieldMissing": "Required field \"{{field}}\" must be filled",
+    "publishYearInvalid": "Year must be a valid 4-digit number (e.g. 2020)",
+    "connectAccount": "Connect account",
+    "accountConnected": "Account connected. Publish will use the saved session.",
+    "savedSessionReady": "Saved session ready for publishing",
+    "savedSessionFound": "Saved API token found. Publish will use it automatically unless it expires.",
+    "enterCredentials": "Enter your Car Butler credentials to connect your account",
+    "connectAndPublish": "Connect & Publish",
+    "publishNow": "Publish Now",
+    "publishToCarButler": "Publish to Car Butler",
+    "publishToFacebook": "Publish to Facebook",
+    "publishToInstagram": "Publish to Instagram",
+    "alreadyPostedFacebook": "This ad has already been posted to Facebook.",
+    "alreadyPostedInstagram": "This ad has already been posted to Instagram.",
+    "postedToFacebook": "Posted to Facebook",
+    "postedToInstagram": "Posted to Instagram",
+    "regenerateAdvert": "Regenerate Ad",
+    "regeneratingAdvert": "Regenerating Ad...",
+    "copy": "Copy",
+    "edit": "Edit",
+    "update": "Edit",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "saveRequiredIntro": "Please correct the following errors to save changes:",
+    "priceInvalid": "Asking Price must be a valid positive number",
+    "mileageInvalid": "Mileage must be a valid non-negative number",
+    "yearRangeInvalid": "Year must be between {{min}} and {{max}}"
+  },
+  "fields": {
+    "make": "Make",
+    "model": "Model Group",
+    "year": "Year",
+    "trim": "Model Specific",
+    "body_style": "Body Type",
+    "vehicle_type": "Vehicle Type",
+    "exterior_color": "Color",
+    "fuel_type": "Fuel Type",
+    "transmission": "Transmission",
+    "drivetrain": "Drive",
+    "engine_displacement": "Engine Size",
+    "door_count": "Doors",
+    "vin": "VIN",
+    "seat_count": "Seats",
+    "asking_price_thb": "Asking Price (THB)",
+    "mileage_km": "Mileage (KM)",
+    "estimated_price_thb": "Est. Price (THB)",
+    "estimated_price_range": "Est. Price Range (THB)",
+    "estimated_price_min_thb": "Est. Price Min (THB)",
+    "estimated_price_max_thb": "Est. Price Max (THB)",
+    "title": "Title",
+    "status": "Listing Status",
+    "dealer_price": "Dealer Price (THB)",
+    "reference_code": "Reference Code",
+    "reasons_to_buy": "Reasons to Buy",
+    "address": "Location Address",
+    "lat": "Latitude",
+    "lng": "Longitude",
+    "line_id": "Line ID",
+    "drive": "Drive",
+    "expire": "Expiry Date",
+    "featured_expire": "Featured Expiry Date",
+    "video_url": "Video URL",
+    "image_ids": "Image IDs"
+  },
+  "confidence": {
+    "confirmed": "Confirmed",
+    "estimated": "Estimated",
+    "unknown": "Unknown"
+  },
+  "errors": {
+    "unclear_image": {
+      "title": "Image Too Unclear",
+      "tip": "Try a clearer, well-lit photo of the car from the front, side, or rear."
+    },
+    "partial_car": {
+      "title": "Car Not Fully in Frame",
+      "tip": "Show more of the vehicle—avoid tight crops or half-visible cars. Include the full car or a clear front, side, or rear view."
+    },
+    "multiple_cars": {
+      "title": "Multiple Cars Detected",
+      "tip": "Please upload a photo where one car is clearly the main subject."
+    },
+    "unsupported_format": {
+      "title": "Unsupported Format",
+      "tip": "Please upload a JPG, PNG, or WebP image."
+    },
+    "no_match": {
+      "title": "No Reliable Match Found",
+      "tip": "The car could not be identified. Try a higher-resolution image or a different angle."
+    },
+    "not_a_car": {
+      "title": "Not a Car Image",
+      "tip": "Please upload a photo of a car."
+    },
+    "API_KEY_MISSING": {
+      "title": "Service Not Configured",
+      "tip": "The app is not set up correctly. Please contact support."
+    },
+    "GEMINI_ACCESS_DENIED": {
+      "title": "Access Blocked",
+      "tip": "The AI service could not be reached. Please contact support."
+    },
+    "PARSE_ERROR": {
+      "title": "Scan Failed",
+      "tip": "Something went wrong while analyzing the photo. Please try again."
+    },
+    "SERVICE_UNAVAILABLE": {
+      "title": "Service Temporarily Busy",
+      "tip": "Our AI service is under high load right now. Please wait a moment and try again."
+    },
+    "RATE_LIMIT": {
+      "title": "Too Many Requests",
+      "tip": "You've sent too many scans in a short time. Please wait a few seconds and try again."
+    },
+    "default": {
+      "title": "Something Went Wrong",
+      "tip": "An unexpected error occurred. Please try again."
+    }
+  },
+  "installPrompt": {
+    "title": "Install {{product}}",
+    "description": "Add to your home screen for quick access and an app-like experience.",
+    "install": "Install",
+    "notNow": "Not now",
+    "dismiss": "Dismiss install prompt",
+    "dialogLabel": "Install app"
+  },
+  "loadingState": {
+    "analyzingPhoto": "Analyzing Your Photo…",
+    "identifyingSpecs": "Identifying Make, Model, And Specs…"
+  },
+  "login": {
+    "welcomeBack": "Welcome Back",
+    "signInToAccess": "Sign in to access {{product}}",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "signIn": "Sign In",
+    "verifying": "Verifying…",
+    "invalidCredentials": "Invalid username or password. Please try again.",
+    "serverError": "Unable to reach the server. Please try again.",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "loginSuccess": "Login successful!"
+  },
+  "pwa": {
+    "installApp": "Install App",
+    "installing": "Installing…",
+    "installCardHint": "Install for a faster, app-like experience",
+    "alreadyInstalled": "App Installed",
+    "alreadyInstalledDesc": "App is already installed."
+  }
+}
