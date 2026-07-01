@@ -7,3 +7,4 @@ frontend/dist/
 __pycache__/
 backend/__pycache__/
 .vite/
+weights/

@@ -11,9 +11,19 @@ from __future__ import annotations
 import os
 
 from pathlib import Path
-
+from io import BytesIO
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from PIL import Image
+import torch
+from fastapi import FastAPI, UploadFile, File,HTTPException
+from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+from google import genai
+from google.genai import types
+from google.genai.types import RawReferenceImage
+from torchvision import transforms
+from vertexai.preview.vision_models import ImageGenerationModel, Image
+from model import model, device, transform_image
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -630,3 +640,140 @@ def predict_features_endpoint(body: PredictFeaturesRequest):
 
     image_blobs, _ = collect_image_parts(body)
     return predict_features(image_blobs, threshold=body.threshold, categories=body.categories)
+
+def remove_background(input_path, output_path):
+    image = Image.open(input_path).convert("RGB")
+    
+    # Cast input tensor to half to match model
+    input_tensor = transform_image(image).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        preds = model(input_tensor)[-1].sigmoid().cpu().float()  # cast back to float for PIL
+
+    mask = transforms.ToPILImage()(preds[0].squeeze())
+    mask = mask.resize(image.size)
+
+    result = image.convert("RGBA")
+    return result
+
+
+def generate_product_image(
+    foreground: Image.Image,
+    background_path: str,
+    project_id: str,
+    location: str,
+    prompt: str,
+):
+    """
+    foreground: transparent product image from BiRefNet
+    background_path: local background inside Docker
+    returns: generated PIL Image
+    """
+
+    client = genai.Client(
+        vertexai=True,
+        project=project_id,
+        location=location,
+    )
+
+    # ---------- Foreground ----------
+    fg_buffer = BytesIO()
+    foreground.save(fg_buffer, format="PNG")
+
+    foreground_ref = RawReferenceImage(
+        reference_id=1,
+        reference_image=types.Image(
+            image_bytes=fg_buffer.getvalue(),
+            mime_type="image/png",
+        ),
+    )
+
+    # ---------- Background ----------
+    background = Image.open(background_path).convert("RGB")
+
+    bg_buffer = BytesIO()
+    background.save(bg_buffer, format="JPEG")
+
+    background_ref = RawReferenceImage(
+        reference_id=2,
+        reference_image=types.Image(
+            image_bytes=bg_buffer.getvalue(),
+            mime_type="image/jpeg",
+        ),
+    )
+
+    # ---------- Generate ----------
+    response = client.models.edit_image(
+        model="imagen-3.0-capability-001",
+        prompt=prompt,
+        reference_images=[
+            foreground_ref,
+            background_ref,
+        ],
+        config=types.EditImageConfig(
+            number_of_images=1,
+            output_mime_type="image/png",
+        ),
+    )
+
+    result = Image.open(
+        BytesIO(response.generated_images[0].image.image_bytes)
+    )
+    return result
+
+
+
+PROJECT_ID = os.getenv("VERTEX_AI_PROJECT_ID")
+LOCATION = os.getenv("VERTEX_AI_LOCATION")
+
+# Background image inside Docker
+BACKGROUND_PATH = "/app/assets/car_bg.jpeg"
+
+
+@app.post("/enhance-image")
+async def generate_product_image_endpoint(
+    file: UploadFile = File(...)
+):
+    try:
+        # Read uploaded image
+        image_bytes = await file.read()
+        input_image = Image.open(BytesIO(image_bytes)).convert("RGB")
+
+        # Remove background
+        foreground = remove_background(input_image)
+
+        # Generate final image
+        result = generate_product_image(
+            foreground=foreground,
+            background_path=BACKGROUND_PATH,
+            project_id=PROJECT_ID,
+            location=LOCATION,
+            prompt="""
+            Use reference image 1 as the product.
+            Use reference image 2 as the background.
+
+            Place the product naturally in the background.
+            Keep the product completely unchanged.
+            Match perspective, lighting, shadows, and reflections.
+            Produce a premium e-commerce product photograph.
+            """,
+        )
+
+        # Return image
+        output = BytesIO()
+        result.save(output, format="PNG")
+        output.seek(0)
+
+        return StreamingResponse(
+            output,
+            media_type="image/png",
+            headers={
+                "Content-Disposition": "inline; filename=result.png"
+            },
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
