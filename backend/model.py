@@ -17,12 +17,15 @@ transform_image = transforms.Compose([
 print("Loading BiRefNet model...")
 
 model = AutoModelForImageSegmentation.from_pretrained(
-    "./weights/BiRefNet",
+    "backend/weights/BiRefNet",
     trust_remote_code=True,
     local_files_only=True
 )
 
 model.to(device)
-print(model.eval())
+print(device)
+model.eval()
 
 print(f"Model loaded on {device}")
+# import os
+# print(os.path.exists("backend/weights/BiRefNet"))

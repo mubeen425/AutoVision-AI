@@ -10,3 +10,7 @@ torch
 torchvision
 transformers
 ipykernel
+einops 
+kornia
+timm
+python-multipart

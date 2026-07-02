@@ -23,7 +23,10 @@ from google.genai import types
 from google.genai.types import RawReferenceImage
 from torchvision import transforms
 from vertexai.preview.vision_models import ImageGenerationModel, Image
-from model import model, device, transform_image
+from backend.vertexAI import blend_two_images
+import base64
+import io
+# from backend.model import model, device, transform_image
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -620,16 +623,99 @@ def enhance_images_endpoint(body: EnhanceRequest):
     results = enhance_images(image_blobs, car_identity=body.car_identity)
     return {"results": results}
 
+prompt="""
+Using the car from the first image, place it onto the background from the second image, following these steps in order:
 
+1. ANALYZE TYRE CONTACT: First, identify exactly where the car's tyres/wheels touch the ground in the original image. Use this contact line as the anchor point for placement — the car must be grounded so all tyres sit flush on the new floor, with no gap and no sinking below the surface.
+
+2. CALCULATE PROPER SIZE: Estimate the car's real-world size class (compact/hatchback, sedan, SUV, etc.) from its proportions. If the car is a smaller vehicle (hatchback, compact, small sedan), scale it up more noticeably so it fills a similar visual footprint in the frame as a larger car would — small cars should look substantial and prominent, not tiny or lost in the scene. If the car is already a larger vehicle (SUV, sedan, truck), apply a moderate size increase. In all cases keep proportions realistic and undistorted, and match the new background's perspective and depth cues (floor lines, vanishing point, surrounding objects).
+
+3. UNDERSTAND THE NEW BACKGROUND: Read the new background's floor plane, horizon line, and light direction. Position the car so its ground-contact line aligns naturally with the background's floor perspective, keeping the same viewing angle as the original photo (do not rotate or change the car's angle).
+
+4. POSITION AWAY FROM THE BACKDROP: Place the car well forward in the scene, clearly separated from the back wall — leave a visible gap of open floor space between the car and the background wall, similar to a studio photo where the subject stands several feet in front of the backdrop, not pressed against it. The car should occupy the lower-middle portion of the frame with open floor visible behind it.
+
+5. PLACE FORWARD AND CENTERED: Position the car slightly forward and centered in the frame for a strong, prominent composition, as if it's the hero subject of the shot.
+
+6. ADD CONTACT SHADOW: Add a natural contact single shadow directly under the tyres where they meet the ground, consistent with the background's lighting direction.
+
+7. Enlarge the car to the huge size in the picture.
+
+8. Place the car very away from back wall at the center.
+
+9- Lighting should be in white according to scene.
+Keep the car's color, shape, design, side and angle exactly as in the original image — do not alter, redesign, or reinterpret the vehicle specially logo. Only adjust its size, position, grounding, shadow, and reflection to fit naturally into the new background. High-resolution, photorealistic, commercial automotive photography quality.
+This image already has a car properly placed on a studio floor with a background wall behind it. Your only task is to increase the distance between the car and the back wall.
+
+STRICT REQUIREMENTS:
+- Move the car further forward/downward in the frame, away from the back wall, creating a noticeably larger gap of open floor space between the car and the wall than currently exists.
+- Resize the car and set it according to scene.
+- Enlarge the car to huge size in picture.
+- Do NOT change the car's angle, color,side, design, or any visual details like logo.
+- Do NOT alter the wall, floor pattern, lighting, or any other part of the background.
+- Update the shadow and reflection beneath the car so they stay correctly aligned directly under the car at its new position — do not leave them behind at the old position.
+- The car must remain fully grounded, with tyres flush on the floor, no floating or sinking.
+- Lighting on car should be in white according to scene.
+- Again I am saying enlarge the car to huge size in picture.
+The result should look like the same shot, with the car simply standing further out into the open floor area, clearly separated from the backdrop.
+"""
 @app.post("/api/enhance-image")
 def enhance_image_endpoint(body: EnhanceRequest):
-    """Single-image convenience wrapper around /api/enhance-images."""
+    
+    BACKGROUND_PATH = "backend/assets/car_bg.jpeg"
     if ensure_vertex_initialized() is None:
         return _VERTEX_CONFIG_MISSING
 
-    image_blobs, _ = collect_image_parts(body)
-    results = enhance_images(image_blobs[:1], car_identity=body.car_identity)
-    return results[0] if results else {"error": "no_image"}
+    if not body.images or len(body.images) == 0:
+        return {"error": "no_image"}
+
+    try:
+        # Decode uploaded car image
+        car_bytes = base64.b64decode(body.images[0].base64)
+
+        # Read background
+        with open(BACKGROUND_PATH, "rb") as f:
+            background_bytes = f.read()
+
+        # Generate enhanced image
+        image = blend_two_images(
+            project_id=PROJECT_ID,
+            location=LOCATION,
+            foreground_bytes=car_bytes,
+            background_bytes=background_bytes,
+            prompt=prompt,  # Your existing prompt string
+        )
+
+        if image is None:
+            return {
+                "error": "generation_failed",
+                "error_message": "Gemini did not return an image."
+            }
+
+        # Convert generated image to Base64
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+
+        encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+        return {
+            "enhanced": {
+                "base64": encoded,
+                "mimeType": "image/png",
+            }
+        }
+
+    except Exception as e:
+        return {
+            "error": "enhancement_failed",
+            "error_message": str(e),
+        }
+    # """Single-image convenience wrapper around /api/enhance-images."""
+    # if ensure_vertex_initialized() is None:
+    #     return _VERTEX_CONFIG_MISSING
+
+    # image_blobs, _ = collect_image_parts(body)
+    # results = enhance_images(image_blobs[:1], car_identity=body.car_identity)
+    # return results[0] if results else {"error": "no_image"}
 
 
 @app.post("/predict-features")
@@ -641,33 +727,66 @@ def predict_features_endpoint(body: PredictFeaturesRequest):
     image_blobs, _ = collect_image_parts(body)
     return predict_features(image_blobs, threshold=body.threshold, categories=body.categories)
 
-def remove_background(input_path, output_path):
-    image = Image.open(input_path).convert("RGB")
+# def remove_background(input_path, output_path):
+#     image = Image.open(input_path).convert("RGB")
     
-    # Cast input tensor to half to match model
-    input_tensor = transform_image(image).unsqueeze(0).to(device)
+#     # Cast input tensor to half to match model
+#     input_tensor = transform_image(image).unsqueeze(0).to(device)
 
-    with torch.no_grad():
-        preds = model(input_tensor)[-1].sigmoid().cpu().float()  # cast back to float for PIL
+#     with torch.no_grad():
+#         preds = model(input_tensor)[-1].sigmoid().cpu().float()  # cast back to float for PIL
 
-    mask = transforms.ToPILImage()(preds[0].squeeze())
-    mask = mask.resize(image.size)
+#     mask = transforms.ToPILImage()(preds[0].squeeze())
+#     mask = mask.resize(image.size)
 
-    result = image.convert("RGBA")
-    return result
+#     result = image.convert("RGBA")
+    # return result
+
+def merge_images(
+    foreground: Image.Image,
+    background: Image.Image,
+) -> Image.Image:
+    """
+    Merge a transparent foreground image onto a background image.
+
+    Args:
+        foreground: PIL Image with transparency (RGBA)
+        background: PIL Image
+
+    Returns:
+        Merged PIL Image
+    """
+
+    # Ensure correct modes
+    foreground = foreground.convert("RGBA")
+    background = background.convert("RGBA")
+
+    # Resize background to match foreground
+    background = background.resize(foreground.size, Image.Resampling.LANCZOS)
+
+    # Merge
+    merged = Image.alpha_composite(background, foreground)
+
+    return merged
 
 
 def generate_product_image(
-    foreground: Image.Image,
-    background_path: str,
+    merged_image: Image.Image,
     project_id: str,
     location: str,
     prompt: str,
-):
+) -> Image.Image:
     """
-    foreground: transparent product image from BiRefNet
-    background_path: local background inside Docker
-    returns: generated PIL Image
+    Sends the merged image to Vertex AI Imagen for enhancement.
+
+    Args:
+        merged_image: PIL Image (foreground already merged with background)
+        project_id: Google Cloud project ID
+        location: Vertex AI region (e.g. us-central1)
+        prompt: Editing prompt
+
+    Returns:
+        PIL.Image.Image
     """
 
     client = genai.Client(
@@ -676,39 +795,23 @@ def generate_product_image(
         location=location,
     )
 
-    # ---------- Foreground ----------
-    fg_buffer = BytesIO()
-    foreground.save(fg_buffer, format="PNG")
+    # Convert merged image to bytes
+    buffer = BytesIO()
+    merged_image.save(buffer, format="PNG")
+    buffer.seek(0)
 
-    foreground_ref = RawReferenceImage(
-        reference_id=1,
-        reference_image=types.Image(
-            image_bytes=fg_buffer.getvalue(),
-            mime_type="image/png",
-        ),
-    )
-
-    # ---------- Background ----------
-    background = Image.open(background_path).convert("RGB")
-
-    bg_buffer = BytesIO()
-    background.save(bg_buffer, format="JPEG")
-
-    background_ref = RawReferenceImage(
-        reference_id=2,
-        reference_image=types.Image(
-            image_bytes=bg_buffer.getvalue(),
-            mime_type="image/jpeg",
-        ),
-    )
-
-    # ---------- Generate ----------
+    # Send image to Imagen
     response = client.models.edit_image(
         model="imagen-3.0-capability-001",
         prompt=prompt,
         reference_images=[
-            foreground_ref,
-            background_ref,
+            types.RawReferenceImage(
+                reference_id=1,
+                reference_image=types.Image(
+                    image_bytes=buffer.getvalue(),
+                    mime_type="image/png",
+                ),
+            )
         ],
         config=types.EditImageConfig(
             number_of_images=1,
@@ -716,64 +819,137 @@ def generate_product_image(
         ),
     )
 
+    # Convert response to PIL Image
     result = Image.open(
         BytesIO(response.generated_images[0].image.image_bytes)
     )
+
     return result
+# BACKGROUND_PATH = "backend/assets/car_bg.jpeg"
 
 
 
+# @app.post("/test")
+# async def testing(
+#     image: UploadFile = File(...),
+# ):
+#     try:
+#         # -----------------------------
+#         # Read uploaded image
+#         # -----------------------------
+#         print("Started Reading")
+#         image_bytes = await image.read()
+#         input_image = Image.open(BytesIO(image_bytes)).convert("RGB")
+#         print("Image Readed")
+
+#         # -----------------------------
+#         # Remove background
+#         # -----------------------------
+#         # foreground = remove_background(input_image)
+
+#         # -----------------------------
+#         # Load background
+#         # -----------------------------
+#         print("Bg Loading Started")
+
+#         background = Image.open(BACKGROUND_PATH)
+#         print("Bg Loading completed")
+#         # -----------------------------
+#         # Merge foreground & background
+#         # -----------------------------
+#         print("merging start")
+#         merged_image = merge_images(
+#             foreground=input_image,
+#             background=background,
+#         )
+#         print("merging completed")
+
+#         # -----------------------------
+#         # Enhance with Vertex AI Imagen
+#         # -----------------------------
+#         print("Generation started")
+#         result = generate_product_image(
+#             merged_image=merged_image,
+#             project_id=PROJECT_ID,
+#             location=LOCATION,
+#             prompt="""
+#             A professional studio photograph of a car positioned in a 3/4 front view and perfectly centered within a sophisticated showroom environment. but do no change the backgorund and car.
+#             """,
+#         )
+#         print("generation Completed")
+
+#         # -----------------------------
+#         # Return image
+#         # -----------------------------
+#         print("Returning Started")
+#         output = BytesIO()
+#         result.save(output, format="PNG")
+#         output.seek(0)
+#         print("Returning Completed")
+        
+#         return StreamingResponse(
+#             output,
+#             media_type="image/png",
+#             headers={
+#         "Content-Disposition": 'attachment; filename="result.png"'
+#     },
+#         )
+
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=500,
+#             detail=str(e),
+#         )
 PROJECT_ID = os.getenv("VERTEX_AI_PROJECT_ID")
 LOCATION = os.getenv("VERTEX_AI_LOCATION")
 
-# Background image inside Docker
-BACKGROUND_PATH = "/app/assets/car_bg.jpeg"
+# # Background image inside Docker
+# # BACKGROUND_PATH = "/app/assets/car_bg.jpeg"
 
 
-@app.post("/enhance-image")
-async def generate_product_image_endpoint(
-    file: UploadFile = File(...)
-):
-    try:
-        # Read uploaded image
-        image_bytes = await file.read()
-        input_image = Image.open(BytesIO(image_bytes)).convert("RGB")
+# @app.post("/api/enhance-images")
+# async def generate_product_image_endpoint(
+#     image: UploadFile = File(...)
+# ):
+#     blend_two_images(
+#     project_id=PROJECT_ID,
+#     location=LOCATION,
+#     img1_path="backend/Images/car10.jfif",
+#     img2_path="backend/Images/car_bg.jpeg",
+#     prompt="""
+# Using the car from the first image, place it onto the background from the second image, following these steps in order:
 
-        # Remove background
-        foreground = remove_background(input_image)
+# 1. ANALYZE TYRE CONTACT: First, identify exactly where the car's tyres/wheels touch the ground in the original image. Use this contact line as the anchor point for placement — the car must be grounded so all tyres sit flush on the new floor, with no gap and no sinking below the surface.
 
-        # Generate final image
-        result = generate_product_image(
-            foreground=foreground,
-            background_path=BACKGROUND_PATH,
-            project_id=PROJECT_ID,
-            location=LOCATION,
-            prompt="""
-            Use reference image 1 as the product.
-            Use reference image 2 as the background.
+# 2. CALCULATE PROPER SIZE: Estimate the car's real-world size class (compact/hatchback, sedan, SUV, etc.) from its proportions. If the car is a smaller vehicle (hatchback, compact, small sedan), scale it up more noticeably so it fills a similar visual footprint in the frame as a larger car would — small cars should look substantial and prominent, not tiny or lost in the scene. If the car is already a larger vehicle (SUV, sedan, truck), apply a moderate size increase. In all cases keep proportions realistic and undistorted, and match the new background's perspective and depth cues (floor lines, vanishing point, surrounding objects).
 
-            Place the product naturally in the background.
-            Keep the product completely unchanged.
-            Match perspective, lighting, shadows, and reflections.
-            Produce a premium e-commerce product photograph.
-            """,
-        )
+# 3. UNDERSTAND THE NEW BACKGROUND: Read the new background's floor plane, horizon line, and light direction. Position the car so its ground-contact line aligns naturally with the background's floor perspective, keeping the same viewing angle as the original photo (do not rotate or change the car's angle).
 
-        # Return image
-        output = BytesIO()
-        result.save(output, format="PNG")
-        output.seek(0)
+# 4. POSITION AWAY FROM THE BACKDROP: Place the car well forward in the scene, clearly separated from the back wall — leave a visible gap of open floor space between the car and the background wall, similar to a studio photo where the subject stands several feet in front of the backdrop, not pressed against it. The car should occupy the lower-middle portion of the frame with open floor visible behind it.
 
-        return StreamingResponse(
-            output,
-            media_type="image/png",
-            headers={
-                "Content-Disposition": "inline; filename=result.png"
-            },
-        )
+# 5. PLACE FORWARD AND CENTERED: Position the car slightly forward and centered in the frame for a strong, prominent composition, as if it's the hero subject of the shot.
 
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
+# 6. ADD CONTACT SHADOW: Add a natural contact single shadow directly under the tyres where they meet the ground, consistent with the background's lighting direction.
+
+# 7. Enlarge the car to the huge size in the picture.
+
+# 8. Place the car very away from back wall at the center.
+
+# 9- Lighting should be in white according to scene.
+# Keep the car's color, shape, design, side and angle exactly as in the original image — do not alter, redesign, or reinterpret the vehicle specially logo. Only adjust its size, position, grounding, shadow, and reflection to fit naturally into the new background. High-resolution, photorealistic, commercial automotive photography quality.
+# This image already has a car properly placed on a studio floor with a background wall behind it. Your only task is to increase the distance between the car and the back wall.
+
+# STRICT REQUIREMENTS:
+# - Move the car further forward/downward in the frame, away from the back wall, creating a noticeably larger gap of open floor space between the car and the wall than currently exists.
+# - Resize the car and set it according to scene.
+# - Enlarge the car to huge size in picture.
+# - Do NOT change the car's angle, color,side, design, or any visual details like logo.
+# - Do NOT alter the wall, floor pattern, lighting, or any other part of the background.
+# - Update the shadow and reflection beneath the car so they stay correctly aligned directly under the car at its new position — do not leave them behind at the old position.
+# - The car must remain fully grounded, with tyres flush on the floor, no floating or sinking.
+# - Lighting on car should be in white according to scene.
+# - Again I am saying enlarge the car to huge size in picture.
+# The result should look like the same shot, with the car simply standing further out into the open floor area, clearly separated from the backdrop.
+# """,
+#     output_path="backend/Images/temp_merged_output10.png"
+# )
